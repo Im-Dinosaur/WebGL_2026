@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#091f2d">
+  <meta name="description" content="작은 물고기가 풀에 숨고 틈을 통과하며 출구를 찾는 모바일 웹 게임, 틈새 헤엄.">
+  <title>틈새 헤엄 · Teumsae Swim</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071722;color:#d3e7e2;font-family:system-ui,sans-serif}
+    body{display:grid;place-items:center;touch-action:none;overscroll-behavior:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    main{position:relative;width:min(100vw,calc(100dvh * 480 / 854),480px);height:min(100dvh,calc(100vw * 854 / 480),854px);background:#091f2d;box-shadow:0 0 90px #0006}
+    canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;background:#091f2d}
+    .kicker{font-size:11px;letter-spacing:.2em;color:#73d7b8}h1{font-size:42px;letter-spacing:-.05em;margin:18px 0;color:#fff}p{font-size:14px;line-height:1.8}
+    .fish{font-size:54px;line-height:1;margin-bottom:20px;color:#ffd669}.track{width:220px;height:4px;border-radius:4px;background:#21424e;margin:24px 0 12px;overflow:hidden}.fill{height:100%;width:0;background:#ffd669;transition:width .2s}
+    #status{font-size:12px;color:#adc7c7;min-height:42px}button{margin:18px;padding:13px 25px;border:0;border-radius:12px;background:#ffd669;color:#091f2d;font-size:15px;cursor:pointer}
+    #error{display:none;max-width:340px;color:#f6ad9f;font-size:13px;line-height:1.7}
+  </style>
+</head>
+<body>
+  <main aria-label="틈새 헤엄 웹 게임">
+    <canvas id="unity-canvas" width="480" height="854" tabindex="0" aria-label="틈새 헤엄 게임 화면. 방향키로 이동, 스페이스로 틈 통과와 그물 작업, E로 미끼 사용, ESC로 일시정지."></canvas>
+    <div id="loading" role="status" aria-live="polite">
+      <div class="fish" aria-hidden="true">◁●</div><span class="kicker">TEUMSAE SWIM</span><h1>틈새 헤엄</h1>
+      <p>작은 물고기의 모험을 준비하고 있어요.</p><div class="track"><div class="fill" id="progress"></div></div>
+      <div id="status">처음 접속하면 잠시 걸릴 수 있어요.</div><div id="error"></div>
+      <button id="retry" hidden onclick="location.reload()">다시 불러오기</button>
+    </div>
+  </main>
+  <script>
+    const canvas = document.getElementById('unity-canvas');
+    const loading = document.getElementById('loading');
+    let failed = false;
+    function showError(message) {
+      if(failed) return; failed=true; loading.style.display='flex';
+      document.getElementById('status').textContent='게임을 불러오지 못했어요.';
+      const error=document.getElementById('error');error.style.display='block';error.textContent='인터넷 연결을 확인한 뒤 최신 Chrome, Edge 또는 Safari에서 다시 열어 주세요. ' + message;
+      document.getElementById('retry').hidden=false;
+    }
+    const config = {
+      dataUrl: 'Build/teumsae-swim.data.unityweb', frameworkUrl: 'Build/teumsae-swim.framework.js.unityweb', codeUrl: 'Build/teumsae-swim.wasm.unityweb',
+      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: 'Teumsae Swim', productVersion: '1.0',
+      matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+      showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
+    };
+    const loader=document.createElement('script');loader.src='Build/teumsae-swim.loader.js';
+    loader.onerror=()=>showError('파일 다운로드 오류');
+    loader.onload=()=>createUnityInstance(canvas,config,p=>{
+      document.getElementById('progress').style.width=Math.round(p*100)+'%';
+      document.getElementById('status').textContent=p<.9?'바닷길을 준비하는 중 · '+Math.round(p*100)+'%':'잠시만요, 물고기가 준비하고 있어요.';
+    }).then(()=>{loading.style.display='none';canvas.focus();}).catch(()=>showError('실행 초기화 오류'));
+    document.body.appendChild(loader);
+    canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3284549419288596201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1427482106696216298}
+  - component: {fileID: 3587371582604814692}
+  - component: {fileID: 8259928707816055845}
+  - component: {fileID: 7307356808239726861}
+  - component: {fileID: 7581994879904691554}
+  m_Layer: 0
+  m_Name: Predator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1427482106696216298
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3284549419288596201}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3587371582604814692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3284549419288596201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92533b9d9934d7948ba0d31c86805cb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorAIComponent
+  noticeDuration: 1
+  sightRange: 3.5
+  sightAngle: 86
+--- !u!114 &8259928707816055845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3284549419288596201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fd340682e616cc428edd76245443629, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorMovementComponent
+  bodyRadius: 0.43
+  patrolSpeed: 1.22
+  chaseSpeed: 3.7
+--- !u!114 &7307356808239726861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3284549419288596201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65c6eb07b6a6cc54d9c64a6128674544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorVisualComponent
+  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+--- !u!114 &7581994879904691554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3284549419288596201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eba04b163cb824b44885a4b514dec005, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.Predator
+  intelligence: {fileID: 3587371582604814692}
+  movement: {fileID: 8259928707816055845}
+  visual: {fileID: 7307356808239726861}
