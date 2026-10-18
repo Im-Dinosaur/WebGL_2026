@@ -7,18 +7,20 @@ namespace TeumsaeSwim
     {
         [SerializeField] private MazeGenerationComponent generation; //미로 생성 구성 요소
         [SerializeField] private MazeTerrainComponent terrain; //지형 처리 구성 요소
+        [SerializeField] private MazeBaitComponent bait; //미끼 발사와 수명 구성 요소
         public MazeData data { get; private set; } //현재 미로
-        public IReadOnlyList<BaitData> baits => terrain.baits; //현재 배치된 미끼
+        public IReadOnlyList<BaitData> baits => bait.baits; //현재 날아가거나 배치된 미끼
 
         public void initialize(int seed, SwimDifficulty difficulty) //생성과 지형 표시 연결
         {
             data = generation.generate(seed, difficulty);
             terrain.initialize(data);
+            bait.initialize(this);
         }
 
         public void tick(float deltaTime) //미끼 수명 갱신
         {
-            terrain.tick(deltaTime);
+            bait.tick(deltaTime);
         }
 
         public Vector2 move(Vector2 position, Vector2 delta, float radius, bool predator, bool squeeze) //지형 충돌을 적용한 이동
@@ -68,12 +70,22 @@ namespace TeumsaeSwim
 
         public bool placeBait(Vector2 position, Vector2 facing) //유효한 위치에 미끼 배치
         {
-            return terrain.placeBait(position, facing);
+            return bait.launch(position, facing);
         }
 
         public void consumeBait(BaitData bait) //도착한 포식자의 미끼 소모
         {
-            terrain.consumeBait(bait);
+            this.bait.consume(bait);
+        }
+
+        public Vector2 moveProjectile(Vector2 position, Vector2 delta, float radius, out Vector2 normal) //미끼의 충돌 지점과 반사 방향 전달
+        {
+            return terrain.moveProjectile(position, delta, radius, out normal);
+        }
+
+        public float netProgress(int id) //설정된 작업 시간에 대한 그물 진행률
+        {
+            return terrain.netProgress(id);
         }
     }
 }

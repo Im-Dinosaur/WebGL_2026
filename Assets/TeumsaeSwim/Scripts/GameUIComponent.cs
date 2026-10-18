@@ -122,7 +122,7 @@ namespace TeumsaeSwim
             Button baitButton = button(bottom, "", new Vector2(20, -13), Vector2.one * 70, () => player.useBait(), new Color32(33, 68, 78, 255), SwimArt.yellow); //미끼 버튼
             baitButton.image.sprite = art.sprite("circle");
             baitLabel = label(baitButton.GetComponent<RectTransform>(), "미끼\n2", Vector2.zero, new Vector2(68, 57), 16, SwimArt.yellow);
-            label(bottom, "E · 순찰 유인", new Vector2(20, -74), new Vector2(115, 24), 10, softWhite);
+            label(bottom, "E · 미끼 발사", new Vector2(20, -74), new Vector2(115, 24), 10, softWhite);
             Image holdImage = picture(bottom, "Hold action", "circle", new Vector2(140, -3), Vector2.one * 102, SwimArt.yellow); //틈 통과와 그물 작업 버튼
             holdImage.raycastTarget = true;
             holdLabel = label(holdImage.rectTransform, "꾹\n누르기", Vector2.zero, new Vector2(92, 76), 20, SwimArt.ink);
@@ -168,9 +168,9 @@ namespace TeumsaeSwim
             string[] titles = { "01   천천히, 자유롭게", "02   작은 몸이 가진 힘", "03   풀 속에서 숨 고르기", "04   눈을 마주치지 않기" }; //도움말 항목 제목
             string[] descriptions = {
                 "왼쪽 스틱으로 헤엄쳐요.\nPC는 WASD 또는 방향키를 사용해요.",
-                "틈에서는 ‘꾹’을 누르며 이동해요.\n그물 앞에서는 멈춰서 2초간 눌러요.",
-                "풀 안에 몸이 완전히 들어가면 숨어요.\n숨어도 포식자와 닿으면 잡혀요.",
-                "? 표시가 1초 채워지면 ! 추격이 시작돼요.\n미끼는 순찰 중인 포식자에게만 통해요."
+                "틈에서는 ‘꾹’을 누르며 이동해요.\n그물도 이동하며 ‘꾹’ 2초면 열려요.",
+                "풀 안에 몸이 완전히 들어가면 안전해요.\n숨어 있는 동안은 닿아도 잡히지 않아요.",
+                "발견 ?가 0.9초 쌓이면 ! 추격해요.\n미끼는 벽에 튕겨 멈추고, 적을 ?로 유인해요."
             }; //도움말 항목 설명
             for (int i = 0; i < 4; i++)
             {
@@ -213,12 +213,12 @@ namespace TeumsaeSwim
             timerLabel.text = formatTime(game.elapsed);
             progressBar.rectTransform.sizeDelta = new Vector2(480 * game.progress, 3);
             baitLabel.text = "미끼\n" + player.baitCount;
-            statusLabel.text = player.hidden ? "●  수풀 안에 숨었어 · 접촉은 조심!" : !string.IsNullOrEmpty(game.danger) ? game.danger : "수면의 출구를 찾아 ↑";
+            statusLabel.text = player.hidden ? "● 수풀 안에 숨었어 · 지금은 안전해!" : !string.IsNullOrEmpty(game.danger) ? game.danger : "수면의 출구를 찾아 ↑";
             statusLabel.color = player.hidden ? SwimArt.mint : string.IsNullOrEmpty(game.danger) ? softWhite : SwimArt.coral;
             if (!string.IsNullOrEmpty(player.message)) { temporaryMessage = player.message; messageTime = 3f; }
             messageTime -= deltaTime;
-            hintLabel.text = messageTime > 0 ? temporaryMessage : player.nearNet ? "그물 앞에서 멈춘 뒤 꾹 · 진행도는 유지돼요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : "풀에 숨고, 바위 뒤로 돌아서 출구까지";
-            holdLabel.text = player.working ? "그물\n" + Mathf.RoundToInt(player.netProgress * 100) + "%" : player.nearNet ? "그물\n꾹" : "꾹\n누르기";
+            hintLabel.text = messageTime > 0 ? temporaryMessage : player.nearNet ? "이동하며 꾹 눌러 그물 해제 · 진행도 유지" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : "미끼로 길을 비우고, 풀숲에서 안전하게 쉬어요";
+            holdLabel.text = player.working ? "그물\n" + Mathf.RoundToInt(player.netProgress * 100) + "%" : player.nearNet ? "그물\n해제" : player.squeezed ? "틈\n통과" : "꾹\n누르기";
             netBar.gameObject.SetActive(player.nearNet);
             netBar.rectTransform.sizeDelta = new Vector2(102 * player.netProgress, 4);
         }
@@ -233,7 +233,7 @@ namespace TeumsaeSwim
             selected = value;
             for (int i = 0; i < 3; i++) difficultyImages[i].color = i == (int)value ? new Color32(53, 121, 119, 255) : panelColor;
             float best = game.bestTime(value); //선택 난이도의 기록
-            string count = value == SwimDifficulty.Practice ? "포식자 1마리 · 느긋한 연습" : value == SwimDifficulty.Normal ? "포식자 2마리 · 기본 헤엄" : "포식자 2마리 · 긴 물길, 빠른 추격"; //난이도 설명
+            string count = value == SwimDifficulty.Practice ? "8구역 · 포식자 2마리" : value == SwimDifficulty.Normal ? "10구역 · 포식자 4마리" : "12구역 · 포식자 6마리"; //난이도 설명
             recordLabel.text = count + (best > 0 ? "\n최고 " + formatTime(best) : "");
         }
 

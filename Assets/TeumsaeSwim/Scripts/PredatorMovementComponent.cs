@@ -8,6 +8,7 @@ namespace TeumsaeSwim
         [SerializeField] private float bodyRadius = .43f; //포식자의 충돌 반경
         [SerializeField] private float patrolSpeed = 1.22f; //기본 순찰 속도
         [SerializeField] private float chaseSpeed = 3.7f; //기본 추격 속도
+        [SerializeField] private float lureSpeed = 2.1f; //미끼를 향해 이동하는 속도
         private Maze maze; //지형 진입점
         private List<int> path = new List<int>(); //현재 이동 경로
         private int pathIndex; //다음 경유지
@@ -82,7 +83,7 @@ namespace TeumsaeSwim
             Vector2 delta = waypoint - position; //경유지 방향
             if (delta.magnitude < .03f) return;
             turn(delta, deltaTime);
-            float speed = (state == PredatorState.Chase ? chaseSpeed : patrolSpeed) * difficultyScale; //현재 행동 속도
+            float speed = (state == PredatorState.Chase ? chaseSpeed : state == PredatorState.Lure ? lureSpeed : patrolSpeed) * difficultyScale; //현재 행동 속도
             transform.position = maze.move(position, Vector2.ClampMagnitude(delta, speed * deltaTime), bodyRadius, true, false);
         }
 

@@ -7,7 +7,7 @@ namespace TeumsaeSwim
     public enum SwimPhase { Home, Playing, Paused, Won, Lost }
     public enum SwimDifficulty { Practice, Normal, Challenge }
     public enum TerrainKind { Water, Wall, Gap, Net, Grass }
-    public enum PredatorState { Patrol, Notice, Chase, Return }
+    public enum PredatorState { Patrol, Notice, Chase, Return, Lure }
     public enum SwimCue { Bait, Squeeze, Tear, Open, Notice, Chase, Win, Lose }
 
     [Serializable]
@@ -58,7 +58,7 @@ namespace TeumsaeSwim
                 if (id == to) break;
                 foreach (int next in neighbors(id))
                 {
-                    if (previous[next] >= 0 || !passable(next, predator)) continue;
+                    if (previous[next] >= 0 || !passable(next, predator) || !gapAllows(id, next) || !gapAllows(next, id)) continue;
                     previous[next] = id;
                     queue.Enqueue(next);
                 }
@@ -76,6 +76,12 @@ namespace TeumsaeSwim
             return !predator || (cells[id].kind != TerrainKind.Gap && (cells[id].kind != TerrainKind.Net || cells[id].netOpen));
         }
 
+        private bool gapAllows(int from, int to) //틈의 실제 통로 방향과 일치하는 경로만 허용
+        {
+            if (cells[from].kind != TerrainKind.Gap) return true;
+            return cells[from].horizontal ? from / width == to / width : from % width == to % width;
+        }
+
         public IEnumerable<int> neighbors(int id) //상하좌우 인접 칸
         {
             if (id % width > 0) yield return id - 1;
@@ -88,6 +94,11 @@ namespace TeumsaeSwim
     public sealed class BaitData
     {
         public Vector2 position; //미끼 위치
+        public Vector2 velocity; //날아가는 미끼의 속도
+        public float travelRemaining; //정지 전 남은 이동 거리
+        public float attractDistance; //주변 포식자를 유인하는 거리
+        public int bounceCount; //벽에 반사된 횟수
+        public bool settled; //정지하여 유인 효과가 켜진 상태
         public float remaining; //미끼의 남은 시간
         public Transform visual; //미끼 표시 오브젝트
     }

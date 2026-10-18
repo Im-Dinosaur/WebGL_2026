@@ -42,11 +42,13 @@ namespace TeumsaeSwim.Editor
             cameraObject.transform.position = new Vector3(0, 0, -10);
             link(cameraObject.GetComponent<CameraFollowComponent>(), "gameCamera", camera);
 
-            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(Maze)); //미로 조립
+            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(MazeBaitComponent), typeof(Maze)); //미로 조립
             Maze maze = mazeObject.GetComponent<Maze>(); //미로 진입점
             link(maze, "generation", mazeObject.GetComponent<MazeGenerationComponent>());
             link(maze, "terrain", mazeObject.GetComponent<MazeTerrainComponent>());
+            link(maze, "bait", mazeObject.GetComponent<MazeBaitComponent>());
             link(mazeObject.GetComponent<MazeTerrainComponent>(), "art", art);
+            link(mazeObject.GetComponent<MazeBaitComponent>(), "art", art);
 
             var playerObject = new GameObject("Player", typeof(PlayerInputComponent), typeof(PlayerMovementComponent), typeof(PlayerInteractionComponent), typeof(PlayerVisualComponent), typeof(Player)); //플레이어 조립
             Player player = playerObject.GetComponent<Player>(); //플레이어 진입점
@@ -138,6 +140,44 @@ namespace TeumsaeSwim.Editor
         public static void prepareAndVerify() //배치 실행에서 씬 조립과 검증 연결
         {
             setup();
+            verify();
+        }
+
+        [MenuItem("Teumsae Swim/4. Apply feedback update")]
+        public static void applyFeedbackUpdate() //기존 씬과 프리팹을 유지하면서 승인된 구성과 설정만 갱신
+        {
+            EditorSceneManager.OpenScene(scenePath);
+            Maze maze = UnityEngine.Object.FindFirstObjectByType<Maze>(); //기존 씬의 미로 진입점
+            MazeBaitComponent bait = maze.GetComponent<MazeBaitComponent>(); //분리한 미끼 구성 요소
+            if (bait == null) bait = maze.gameObject.AddComponent<MazeBaitComponent>();
+            link(maze, "bait", bait);
+            link(bait, "art", AssetDatabase.LoadAssetAtPath<SwimArt>(artPath));
+            SerializedObject generation = new SerializedObject(maze.GetComponent<MazeGenerationComponent>()); //기존 생성기 설정
+            generation.FindProperty("practiceModules").intValue = 8;
+            generation.FindProperty("normalModules").intValue = 10;
+            generation.FindProperty("challengeModules").intValue = 12;
+            generation.FindProperty("practicePredators").intValue = 2;
+            generation.FindProperty("normalPredators").intValue = 4;
+            generation.FindProperty("challengePredators").intValue = 6;
+            generation.ApplyModifiedPropertiesWithoutUndo();
+            EditorSceneManager.MarkSceneDirty(maze.gameObject.scene);
+            EditorSceneManager.SaveScene(maze.gameObject.scene);
+            GameObject prefab = PrefabUtility.LoadPrefabContents(prefabPath); //보존하며 수정할 포식자 프리팹
+            try
+            {
+                SerializedObject ai = new SerializedObject(prefab.GetComponent<PredatorAIComponent>()); //발견 시간 설정
+                ai.FindProperty("noticeDuration").floatValue = .9f;
+                ai.ApplyModifiedPropertiesWithoutUndo();
+                PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(prefab); }
+            AssetDatabase.SaveAssets();
+            Debug.Log("TEUMSAE_FEEDBACK_UPDATE_OK");
+        }
+
+        public static void upgradeAndVerify() //기존 자원 갱신과 규칙 검증 연결
+        {
+            applyFeedbackUpdate();
             verify();
         }
 

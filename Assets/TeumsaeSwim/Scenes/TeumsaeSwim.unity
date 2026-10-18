@@ -322,6 +322,7 @@ GameObject:
   - component: {fileID: 634707483}
   - component: {fileID: 634707482}
   - component: {fileID: 634707481}
+  - component: {fileID: 634707485}
   m_Layer: 0
   m_Name: Maze
   m_TagString: Untagged
@@ -343,6 +344,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.Maze
   generation: {fileID: 634707483}
   terrain: {fileID: 634707482}
+  bait: {fileID: 634707485}
 --- !u!114 &634707482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,7 +359,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeTerrainComponent
   art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
   netWorkTime: 2
-  baitDuration: 8
   gapWidth: 0.66
 --- !u!114 &634707483
 MonoBehaviour:
@@ -372,9 +373,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeGenerationComponent
   tileSize: 2.2
-  practiceModules: 6
-  normalModules: 7
-  challengeModules: 8
+  practiceModules: 8
+  normalModules: 10
+  challengeModules: 12
+  practicePredators: 2
+  normalPredators: 4
+  challengePredators: 6
 --- !u!4 &634707484
 Transform:
   m_ObjectHideFlags: 0
@@ -390,6 +394,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &634707485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634707480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e7a26af3ea7bb43be1825ed560e458, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeBaitComponent
+  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  launchSpeed: 8
+  launchDistance: 6.6
+  bounceDistance: 1.1
+  attractDistance: 8.8
+  baitDuration: 8
+  bodyRadius: 0.18
 --- !u!1 &770461725
 GameObject:
   m_ObjectHideFlags: 0

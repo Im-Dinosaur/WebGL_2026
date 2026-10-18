@@ -49,7 +49,7 @@ namespace TeumsaeSwim
         {
             float heading = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg; //물고기 방향 각도
             body.localRotation = Quaternion.Euler(0, 0, heading);
-            marker.text = state == PredatorState.Chase ? "!" : state == PredatorState.Notice || state == PredatorState.Return ? "?" : "";
+            marker.text = state == PredatorState.Chase ? "!" : state == PredatorState.Notice || state == PredatorState.Return || state == PredatorState.Lure ? "?" : "";
             marker.color = state == PredatorState.Chase ? SwimArt.coral : SwimArt.yellow;
             gauge.gameObject.SetActive(state == PredatorState.Notice);
             gauge.localScale = new Vector3(Mathf.Clamp01(progress) * .8f, .07f, 1f);

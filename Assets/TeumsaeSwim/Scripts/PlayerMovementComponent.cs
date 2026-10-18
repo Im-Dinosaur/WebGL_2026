@@ -29,11 +29,12 @@ namespace TeumsaeSwim
         {
             Vector2 position = transform.position; //현재 위치
             bool insideGap = maze.overlapsGap(position, bodyRadius); //틈새에 걸친 상태
-            squeezed = hold || insideGap;
-            if (working || (insideGap && !hold)) { velocity = Vector2.zero; return; }
+            bool enteringGap = hold && !working && maze.overlapsGap(position, bodyRadius + .35f); //틈 근처의 누르기 입력
+            squeezed = enteringGap || insideGap;
+            if (insideGap && !hold) { velocity = Vector2.zero; return; }
             if (input.sqrMagnitude > .04f) facing = input.normalized;
             velocity = Vector2.MoveTowards(velocity, input * (squeezed ? squeezeSpeed : swimSpeed), acceleration * deltaTime);
-            if (hold) position = maze.alignGap(position, input, deltaTime);
+            if (hold && squeezed) position = maze.alignGap(position, input, deltaTime);
             Vector2 next = maze.move(position, velocity * deltaTime, radius, false, squeezed); //충돌 적용 결과
             if (deltaTime > 0) velocity = (next - position) / deltaTime;
             transform.position = next;

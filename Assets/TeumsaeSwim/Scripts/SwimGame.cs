@@ -55,10 +55,10 @@ namespace TeumsaeSwim
             foreach (Predator predator in predators)
             {
                 predator.tick(deltaTime);
-                caught |= Vector2.Distance(player.position, predator.position) < player.radius + predator.radius;
+                caught |= !player.hidden && Vector2.Distance(player.position, predator.position) < player.radius + predator.radius;
                 dangerRank = Mathf.Max(dangerRank, predator.state == PredatorState.Chase ? 3 : predator.state == PredatorState.Notice ? 2 : predator.state == PredatorState.Return ? 1 : 0);
             }
-            danger = dangerRank == 3 ? "추격 중!  바위 뒤로 피하자" : dangerRank == 2 ? "들키는 중!  시야를 벗어나자" : dangerRank == 1 ? "포식자가 순찰로 돌아가는 중" : "";
+            danger = dangerRank == 3 ? "추격 중! 풀숲에 숨거나 바위 뒤로 피하자" : dangerRank == 2 ? "들키는 중! 시야를 벗어나자" : dangerRank == 1 ? "포식자가 순찰로 돌아가는 중" : "";
             bool escaped = Vector2.Distance(player.position, maze.data.center(maze.data.exit)) < .65f; //출구 도달 결과
             session.advance(deltaTime, caught, escaped);
             cameraFollow.tick(deltaTime);

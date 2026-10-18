@@ -5,10 +5,14 @@ namespace TeumsaeSwim
 {
     public sealed class MazeGenerationComponent : MonoBehaviour
     {
+        private const int moduleHeight = 6; //이웃 회랑 사이의 바위 경계를 포함한 구역 높이
         [SerializeField] private float tileSize = 2.2f; //지형 한 칸의 크기
-        [SerializeField] private int practiceModules = 6; //연습 구역 수
-        [SerializeField] private int normalModules = 7; //기본 구역 수
-        [SerializeField] private int challengeModules = 8; //도전 구역 수
+        [SerializeField, Min(4)] private int practiceModules = 8; //연습 구역 수
+        [SerializeField, Min(4)] private int normalModules = 10; //기본 구역 수
+        [SerializeField, Min(4)] private int challengeModules = 12; //도전 구역 수
+        [SerializeField, Min(1)] private int practicePredators = 2; //연습 포식자 수
+        [SerializeField, Min(1)] private int normalPredators = 4; //기본 포식자 수
+        [SerializeField, Min(1)] private int challengePredators = 6; //도전 포식자 수
 
         public MazeData generate(int seed, SwimDifficulty difficulty) //연결이 검증된 구역 미로 생성
         {
@@ -36,7 +40,10 @@ namespace TeumsaeSwim
         {
             var random = new System.Random(seed); //재현 가능한 난수
             int modules = difficulty == SwimDifficulty.Practice ? practiceModules : difficulty == SwimDifficulty.Normal ? normalModules : challengeModules; //구역 수
-            var data = new MazeData { width = 11, height = modules * 5 + 3, tileSize = tileSize, seed = seed }; //미로 데이터
+            modules = Mathf.Max(4, modules);
+            int count = difficulty == SwimDifficulty.Practice ? practicePredators : difficulty == SwimDifficulty.Normal ? normalPredators : challengePredators; //배치할 포식자 수
+            count = Mathf.Clamp(count, 1, modules - 2);
+            var data = new MazeData { width = 13, height = modules * moduleHeight + 3, tileSize = tileSize, seed = seed }; //미로 데이터
             data.cells = new MazeCell[data.width * data.height];
             for (int i = 0; i < data.cells.Length; i++) data.cells[i] = new MazeCell();
             int entryX = 2; //구역 입구의 가로 위치
@@ -44,22 +51,28 @@ namespace TeumsaeSwim
             carve(data, entryX, 1);
             for (int module = 0; module < modules; module++)
             {
-                int baseY = module * 5 + 2; //구역의 시작 높이
-                int exitX = entryX <= 4 ? random.Next(7, 9) : random.Next(2, 4); //반대편 출구 위치
+                int baseY = module * moduleHeight + 2; //구역의 시작 높이
+                int exitX = entryX <= 4 ? random.Next(9, 11) : random.Next(2, 4); //반대편 출구 위치
                 int middleY = baseY + 2; //주 통로 높이
                 for (int y = baseY - 1; y <= middleY; y++) carve(data, entryX, y);
                 for (int x = Mathf.Min(entryX, exitX); x <= Mathf.Max(entryX, exitX); x++) carve(data, x, middleY);
-                for (int y = middleY; y <= baseY + 5; y++) carve(data, exitX, y);
+                for (int y = middleY; y <= baseY + moduleHeight; y++) carve(data, exitX, y);
                 //주 통로 옆의 작은 회랑은 우회와 시야 차단에 사용한다.
-                int loopLeft = random.Next(3, 5); //회랑 왼쪽 끝
-                int loopRight = random.Next(6, 8); //회랑 오른쪽 끝
-                int offset = module % 2 == 0 ? 1 : -1; //회랑이 뻗는 방향
+                int loopLeft = random.Next(4, 6); //회랑 왼쪽 끝
+                int loopRight = random.Next(7, 9); //회랑 오른쪽 끝
+                if (entryX <= 4) loopLeft = Mathf.Max(loopLeft, entryX + 2);
+                else loopRight = Mathf.Min(loopRight, entryX - 2);
+                int offset = random.Next(2) == 0 ? 1 : -1; //회랑이 뻗는 방향
                 for (int x = loopLeft; x <= loopRight; x++) carve(data, x, middleY + offset * 2);
                 for (int distance = 1; distance <= 2; distance++)
                 {
                     carve(data, loopLeft, middleY + offset * distance);
                     carve(data, loopRight, middleY + offset * distance);
                 }
+                int branchX = random.Next(loopLeft + 1, loopRight); //미끼를 던져 유인할 곁가지 위치
+                carve(data, branchX, middleY - offset);
+                carve(data, branchX, middleY - offset * 2);
+                carve(data, Mathf.Clamp(branchX + (random.Next(2) == 0 ? 1 : -1), loopLeft, loopRight), middleY - offset * 2);
                 if (module > 0)
                 {
                     int feature = baseY * data.width + entryX; //구역 경계의 상호작용 칸
@@ -69,8 +82,11 @@ namespace TeumsaeSwim
                 int grassX = entryX < exitX ? entryX + 1 : entryX - 1; //진입 직후의 은신처
                 data.cells[middleY * data.width + grassX].kind = TerrainKind.Grass;
                 data.cells[(middleY + offset * 2) * data.width + loopLeft].kind = TerrainKind.Grass;
-                if (module == 2 || (module == 5 && difficulty != SwimDifficulty.Practice))
-                    data.homes.Add(middleY * data.width + (entryX < exitX ? exitX - 1 : exitX + 1));
+                for (int i = 0; i < count; i++)
+                {
+                    int homeModule = 2 + i * (modules - 3) / Mathf.Max(1, count - 1); //시작 구역을 피한 분산 배치
+                    if (module == homeModule) data.homes.Add(middleY * data.width + (entryX < exitX ? exitX - 1 : exitX + 1));
+                }
                 entryX = exitX;
             }
             data.exit = (data.height - 2) * data.width + entryX;

@@ -7,19 +7,16 @@ namespace TeumsaeSwim
     {
         [SerializeField] private SwimArt art; //지형과 안내 그림
         [SerializeField] private float netWorkTime = 2f; //그물 개방에 필요한 누적 시간
-        [SerializeField] private float baitDuration = 8f; //미끼 유지 시간
         [SerializeField] private float gapWidth = .66f; //틈새의 유효 너비
         private MazeData data; //현재 지형 데이터
         private Transform terrainRoot; //재생성할 지형의 루트
         private readonly Dictionary<int, Transform> nets = new Dictionary<int, Transform>(); //열리지 않은 그물 표시
-        public readonly List<BaitData> baits = new List<BaitData>(); //활성 미끼
 
         public void initialize(MazeData mazeData) //지형 데이터와 표시 초기화
         {
             if (terrainRoot != null) { terrainRoot.gameObject.SetActive(false); removeGenerated(terrainRoot.gameObject); }
             data = mazeData;
             nets.Clear();
-            baits.Clear();
             terrainRoot = new GameObject("Generated terrain").transform;
             terrainRoot.SetParent(transform, false);
             float tile = data.tileSize; //지형 한 칸 크기
@@ -119,6 +116,25 @@ namespace TeumsaeSwim
                     if (circleHits(position, radius, obstacle)) return false;
             }
             return true;
+        }
+
+        public Vector2 moveProjectile(Vector2 position, Vector2 delta, float radius, out Vector2 normal) //미끼의 첫 충돌 위치와 반사면 계산
+        {
+            normal = Vector2.zero;
+            if (canOccupy(position + delta, radius, true, false)) return position + delta;
+            bool blockedX = !canOccupy(position + new Vector2(delta.x, 0f), radius, true, false); //가로 방향 충돌
+            bool blockedY = !canOccupy(position + new Vector2(0f, delta.y), radius, true, false); //세로 방향 충돌
+            normal = new Vector2(blockedX ? -Mathf.Sign(delta.x) : 0f, blockedY ? -Mathf.Sign(delta.y) : 0f).normalized;
+            if (normal.sqrMagnitude < .01f) normal = -delta.normalized;
+            float lower = 0f; //충돌하지 않는 이동 비율
+            float upper = 1f; //충돌한 이동 비율
+            for (int i = 0; i < 10; i++)
+            {
+                float middle = (lower + upper) * .5f; //이번에 검사할 이동 비율
+                if (canOccupy(position + delta * middle, radius, true, false)) lower = middle;
+                else upper = middle;
+            }
+            return position + delta * lower;
         }
 
         private IEnumerable<Rect> obstacles(int id, bool predator, bool squeeze, bool sight) //용도에 따라 다른 장애물 영역
@@ -230,20 +246,9 @@ namespace TeumsaeSwim
             return true;
         }
 
-        public bool placeBait(Vector2 position, Vector2 facing) //벽 너머로 배치되지 않는 미끼 생성
+        public float netProgress(int id) //Inspector의 작업 시간에 맞춘 그물 진행률
         {
-            Vector2 target = position + facing.normalized * 1.15f; //바라보는 방향의 투척 위치
-            if (!canOccupy(target, .18f, true, false) || !hasSight(position, target)) return false;
-            var visual = art.shape(terrainRoot, "Bait", "circle", target, Vector2.one * .26f, SwimArt.yellow, 8); //미끼 알갱이
-            art.shape(visual.transform, "Bait ripple", "ring", Vector2.zero, Vector2.one * 3.4f, new Color(1f, .82f, .4f, .4f), 7);
-            baits.Add(new BaitData { position = target, remaining = baitDuration, visual = visual.transform });
-            return true;
-        }
-
-        public void consumeBait(BaitData bait) //먹은 미끼 표시와 데이터 제거
-        {
-            if (bait.visual != null) removeGenerated(bait.visual.gameObject);
-            baits.Remove(bait);
+            return id < 0 ? 0f : Mathf.Clamp01(data.cells[id].netProgress / Mathf.Max(.01f, netWorkTime));
         }
 
         private void removeGenerated(GameObject item) //실행 중과 편집기 검증에서 생성된 표시만 정리
@@ -252,13 +257,5 @@ namespace TeumsaeSwim
             else DestroyImmediate(item);
         }
 
-        public void tick(float deltaTime) //일시정지 중 멈추는 미끼 수명
-        {
-            for (int i = baits.Count - 1; i >= 0; i--)
-            {
-                baits[i].remaining -= deltaTime;
-                if (baits[i].remaining <= 0) consumeBait(baits[i]);
-            }
-        }
     }
 }

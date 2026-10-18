@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92533b9d9934d7948ba0d31c86805cb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorAIComponent
-  noticeDuration: 1
+  noticeDuration: 0.9
   sightRange: 3.5
   sightAngle: 86
 --- !u!114 &8259928707816055845
@@ -65,6 +65,7 @@ MonoBehaviour:
   bodyRadius: 0.43
   patrolSpeed: 1.22
   chaseSpeed: 3.7
+  lureSpeed: 2.1
 --- !u!114 &7307356808239726861
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,7 +10,6 @@ namespace TeumsaeSwim
         [SerializeField] private PredatorVisualComponent visual; //물고기와 시야 표시 구성 요소
         private Maze maze; //지형 진입점
         private Player player; //플레이어 진입점
-        private BaitData baitTarget; //순찰 중 관심을 끈 미끼
         public PredatorState state => intelligence.state; //외부에 표시할 행동 상태
         public bool seesPlayer { get; private set; } //이번 프레임 발견 결과
         public Vector2 position => transform.position; //현재 위치
@@ -32,26 +31,13 @@ namespace TeumsaeSwim
             PredatorState before = state; //직전 행동 상태
             seesPlayer = intelligence.canSee(maze, position, movement.facing, player);
             Vector2 patrolTarget = state == PredatorState.Patrol ? movement.patrolTarget(deltaTime) : position; //기본 순찰 목표
-            if (state == PredatorState.Patrol)
-            {
-                baitTarget = null;
-                float nearest = 5.5f; //미끼 관심 거리
-                foreach (BaitData bait in maze.baits)
-                {
-                    float distance = Vector2.Distance(position, bait.position); //미끼 거리
-                    if (distance >= nearest || !maze.hasSight(position, bait.position) || maze.data.findPath(maze.data.cellAt(position), maze.data.cellAt(bait.position), true).Count == 0) continue;
-                    nearest = distance;
-                    baitTarget = bait;
-                }
-                if (baitTarget != null) patrolTarget = baitTarget.position;
-            }
-            intelligence.advance(seesPlayer, position, player.position, patrolTarget, deltaTime);
-            if (state != PredatorState.Patrol) baitTarget = null;
+            BaitData baitTarget = seesPlayer ? null : intelligence.findBait(maze, position, deltaTime); //미끼 감지 결과
+            intelligence.advance(seesPlayer, position, player.position, patrolTarget, deltaTime, baitTarget);
             movement.tick(intelligence.target, state, deltaTime);
-            if (baitTarget != null && Vector2.Distance(position, baitTarget.position) < .35f) maze.consumeBait(baitTarget);
-            if (state != before && state == PredatorState.Notice) cue?.Invoke(SwimCue.Notice);
+            if (state == PredatorState.Lure && baitTarget != null && Vector2.Distance(position, baitTarget.position) < .65f) maze.consumeBait(baitTarget);
+            if (state != before && (state == PredatorState.Notice || state == PredatorState.Lure)) cue?.Invoke(SwimCue.Notice);
             if (state != before && state == PredatorState.Chase) cue?.Invoke(SwimCue.Chase);
-            visual.tick(maze, movement.facing, state, intelligence.noticeProgress, intelligence.range, intelligence.angle);
+            visual.tick(maze, movement.facing, state, intelligence.noticeFraction, intelligence.range, intelligence.angle);
         }
     }
 }
