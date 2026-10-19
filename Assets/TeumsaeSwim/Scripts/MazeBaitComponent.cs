@@ -32,7 +32,7 @@ namespace TeumsaeSwim
 
         public bool launch(Vector2 position, Vector2 direction) //플레이어 위치에서 바라보는 방향으로 발사
         {
-            if (!maze.canOccupy(position, bodyRadius, true)) return false;
+            if (!maze.canOccupyProjectile(position, bodyRadius)) return false;
             if (direction.sqrMagnitude < .001f) direction = Vector2.up;
             SpriteRenderer visual = art.shape(baitRoot, "Bait", "circle", position, Vector2.one * .3f, SwimArt.yellow, 8); //날아가는 미끼 표시
             BaitData bait = new BaitData //비행과 유인에 필요한 상태

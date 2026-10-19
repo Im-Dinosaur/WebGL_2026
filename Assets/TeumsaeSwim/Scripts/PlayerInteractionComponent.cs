@@ -10,6 +10,7 @@ namespace TeumsaeSwim
         private bool previousWorking; //직전 그물 작업 상태
         private int netTarget = -1; //현재 그물 대상
         public int baitCount { get; private set; } //남은 미끼 개수
+        public bool hasCargo { get; private set; } //이번 판에 획득하여 운반 중인 진주
         public bool working { get; private set; } //그물 작업 중 여부
         public string message { get; private set; } //최근 상호작용 알림
         public event Action<SwimCue> cue; //상호작용 소리 요청
@@ -20,6 +21,7 @@ namespace TeumsaeSwim
         {
             maze = world;
             baitCount = initialBaits;
+            hasCargo = false;
             working = false;
             previousWorking = false;
             netTarget = -1;
@@ -49,6 +51,14 @@ namespace TeumsaeSwim
             baitCount--;
             message = "미끼 발사! 멈추면 주변 포식자를 유인해요";
             cue?.Invoke(SwimCue.Bait);
+        }
+
+        public void collectCargo(Vector2 position, float radius) //이동 후 진주 접촉과 보유 상태 갱신
+        {
+            if (hasCargo || !maze.tryCollectItem(position, radius)) return;
+            hasCargo = true;
+            message = "진주를 찾았어! 출구까지 무사히 가져가자";
+            cue?.Invoke(SwimCue.Pickup);
         }
     }
 }

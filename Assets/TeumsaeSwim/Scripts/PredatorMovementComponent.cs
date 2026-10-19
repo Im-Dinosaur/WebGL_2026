@@ -18,12 +18,14 @@ namespace TeumsaeSwim
         private int patrolGoal; //현재 순찰 목적지
         private float patrolWait; //목적지 도착 후 대기 시간
         private float difficultyScale; //난이도별 이동 배율
+        private PredatorTypeProfile profile; //이번 포식자의 행동별 속도 설정
         private System.Random random; //순찰 선택 난수
         public Vector2 facing { get; private set; } = Vector2.left; //바라보는 방향
         public float radius => bodyRadius; //접촉 판정 반경
 
-        public void initialize(Maze world, int homeCell, SwimDifficulty difficulty, int seed) //순찰 구역과 위치 초기화
+        public void initialize(Maze world, int homeCell, SwimDifficulty difficulty, int seed, PredatorTypeProfile typeProfile = null) //종류와 난이도를 반영하며 순찰 위치 초기화
         {
+            profile = typeProfile;
             maze = world;
             home = homeCell;
             patrolGoal = home;
@@ -34,6 +36,7 @@ namespace TeumsaeSwim
             path.Clear();
             pathIndex = 0;
             goalCell = -1;
+            repathTime = 0;
             patrolWait = .8f;
         }
 
@@ -83,7 +86,7 @@ namespace TeumsaeSwim
             Vector2 delta = waypoint - position; //경유지 방향
             if (delta.magnitude < .03f) return;
             turn(delta, deltaTime);
-            float speed = (state == PredatorState.Chase ? chaseSpeed : state == PredatorState.Lure ? lureSpeed : patrolSpeed) * difficultyScale; //현재 행동 속도
+            float speed = (state == PredatorState.Chase ? chaseSpeed : state == PredatorState.Lure ? lureSpeed : patrolSpeed) * difficultyScale * (profile != null ? profile.speedScale(state) : 1f); //종류와 난이도를 각각 한 번 적용한 행동 속도
             transform.position = maze.move(position, Vector2.ClampMagnitude(delta, speed * deltaTime), bodyRadius, true, false);
         }
 

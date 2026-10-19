@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca4498dfbac5d44ab3945971d8ab0d4, type: 3}
+  m_Name: Alert
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorTypeProfile
+  kind: 2
+  displayName: "\uC608\uBBFC\uD615"
+  description: "\uBC18\uC751\uC774 \uBE60\uB974\uC9C0\uB9CC \uAC00\uAE4C\uC774\uB9CC
+    \uBD10\uC694"
+  accent: {r: 0.9647059, g: 0.49411765, b: 0.43529412, a: 1}
+  fishSprite: {fileID: -2109058083, guid: 80b35e6b8e8d3bc448caf85aea1502a7, type: 3}
+  sightDistance: 2.8
+  noticeDuration: 0.45
+  patrolMultiplier: 1
+  chaseMultiplier: 1
+  lureMultiplier: 1

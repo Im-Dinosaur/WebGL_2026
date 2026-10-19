@@ -10,15 +10,19 @@ namespace TeumsaeSwim
         private Vector2 returnPosition; //발견 직전 순찰 위치
         private BaitData baitTarget; //현재 유인 목표
         private float baitCheckTime; //미끼 경로 검색의 남은 대기 시간
+        private float effectiveRange = 3.5f; //이번 종류에 적용한 시야 거리
+        private float effectiveNoticeTime = .9f; //이번 종류에 적용한 발견 시간
         public PredatorState state { get; private set; } //현재 행동 상태
         public float noticeProgress { get; private set; } //연속 발견 누적 시간
         public Vector2 target { get; private set; } //이동할 행동 목표
-        public float range => sightRange; //시야 표시 거리
+        public float range => effectiveRange; //시야 표시와 판정에 공통으로 적용할 거리
         public float angle => sightAngle; //시야 표시 각도
-        public float noticeFraction => noticeProgress / Mathf.Max(.05f, noticeDuration); //발견 표시의 완료 비율
+        public float noticeFraction => noticeProgress / effectiveNoticeTime; //발견 표시의 완료 비율
 
-        public void initialize() //행동 상태 초기화
+        public void initialize(PredatorTypeProfile profile = null) //종류별 탐지 설정과 행동 상태 초기화
         {
+            effectiveRange = profile != null ? profile.range : Mathf.Max(.1f, sightRange);
+            effectiveNoticeTime = profile != null ? profile.noticeTime : Mathf.Max(.05f, noticeDuration);
             state = PredatorState.Patrol;
             noticeProgress = 0;
             baitTarget = null;
@@ -28,7 +32,7 @@ namespace TeumsaeSwim
         public bool canSee(Maze maze, Vector2 position, Vector2 facing, Player player) //수풀과 지형 및 시야각을 적용한 발견 판정
         {
             Vector2 delta = player.position - position; //플레이어 방향
-            return !player.hidden && delta.magnitude <= sightRange && Vector2.Angle(facing, delta) <= sightAngle * .5f && maze.hasSight(position, player.position);
+            return !player.safe && !player.hidden && delta.magnitude <= effectiveRange && Vector2.Angle(facing, delta) <= sightAngle * .5f && maze.hasSight(position, player.position);
         }
 
         public BaitData findBait(Maze maze, Vector2 position, float deltaTime) //유인 범위와 이동 경로가 유효한 정지 미끼 선택
@@ -68,7 +72,7 @@ namespace TeumsaeSwim
                 if (state == PredatorState.Notice)
                 {
                     noticeProgress += deltaTime;
-                    if (noticeProgress >= noticeDuration) state = PredatorState.Chase;
+                    if (noticeProgress >= effectiveNoticeTime) state = PredatorState.Chase;
                 }
                 target = playerPosition;
                 return;

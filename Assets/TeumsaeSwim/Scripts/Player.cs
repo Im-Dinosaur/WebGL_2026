@@ -13,8 +13,10 @@ namespace TeumsaeSwim
         public Vector2 position => transform.position; //외부에 제공하는 위치
         public float radius => movement.radius; //접촉 판정 반경
         public bool hidden => maze != null && maze.isHidden(position, radius); //수풀 안의 은신 상태
+        public bool safe => maze != null && maze.isSafeZone(position); //시작과 도착 안전구역의 보호 상태
         public bool squeezed => movement.squeezed; //현재 몸을 줄인 상태
         public int baitCount => interaction.baitCount; //남은 미끼 수
+        public bool hasCargo => interaction.hasCargo; //외부에서 조회할 진주 운반 상태
         public bool nearNet => interaction.nearNet; //작업 가능한 그물 존재
         public bool working => interaction.working; //그물 작업 여부
         public float netProgress => interaction.netProgress; //그물 작업 표시
@@ -51,6 +53,7 @@ namespace TeumsaeSwim
             bool wasSqueezed = movement.squeezed; //직전 몸체 상태
             interaction.tick(position, input.moveInput, movement.facing, input.holdInput, input.consumeBaitRequest(), deltaTime);
             movement.tick(input.moveInput, input.holdInput, interaction.working, deltaTime);
+            interaction.collectCargo(position, radius);
             if (!wasSqueezed && movement.squeezed) cue?.Invoke(SwimCue.Squeeze);
             visual.tick(movement.facing, movement.squeezed, movement.moving, hidden, deltaTime);
         }

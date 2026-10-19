@@ -1,0 +1,335 @@
+fileFormatVersion: 2
+guid: 80b35e6b8e8d3bc448caf85aea1502a7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 941249331532666615
+    second: PredatorAtlas_0
+  - first:
+      213: 4007637424224483589
+    second: PredatorAtlas_1
+  - first:
+      213: 5599395789238166321
+    second: PredatorAtlas_2
+  - first:
+      213: -2298363492606041901
+    second: PredatorAtlas_3
+  - first:
+      213: 973800295656418573
+    second: PredatorAtlas_4
+  - first:
+      213: 1851785833366045597
+    second: PredatorAtlas_5
+  - first:
+      213: 1091487271167000494
+    second: PredatorAtlas_6
+  - first:
+      213: -2326996347037866476
+    second: PredatorAtlas_7
+  - first:
+      213: -3076365340959100168
+    second: PredatorAtlas_8
+  - first:
+      213: -6174848080694685285
+    second: PredatorAtlas_9
+  - first:
+      213: 7316445740513502270
+    second: PredatorAtlas_10
+  - first:
+      213: 505621105534971147
+    second: PredatorAtlas_11
+  - first:
+      213: -4090855247016999010
+    second: PredatorAtlas_12
+  - first:
+      213: -585702286982742811
+    second: PredatorAtlas_13
+  - first:
+      213: 5439172635780457805
+    second: PredatorAtlas_14
+  - first:
+      213: -2326442464703005500
+    second: PredatorAtlas_15
+  - first:
+      213: -3124211370162578812
+    second: PredatorAtlas_16
+  - first:
+      213: 4740673400852866481
+    second: PredatorAtlas_17
+  - first:
+      213: 2506571008368064120
+    second: PredatorAtlas_18
+  - first:
+      213: 7698760070805950759
+    second: PredatorAtlas_19
+  - first:
+      213: -5194573436604208792
+    second: PredatorAtlas_20
+  - first:
+      213: -7982446871769903793
+    second: PredatorAtlas_21
+  - first:
+      213: -2881949853977218115
+    second: PredatorAtlas_22
+  - first:
+      213: 8964830800532828346
+    second: PredatorAtlas_23
+  - first:
+      213: 1955399784084050695
+    second: PredatorAtlas_24
+  - first:
+      213: -3036149438655775953
+    second: PredatorAtlas_25
+  - first:
+      213: 9016931721575676796
+    second: PredatorAtlas_26
+  - first:
+      213: -305281776629733377
+    second: PredatorAtlas_27
+  - first:
+      213: 670733113489346587
+    second: PredatorAtlas_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 320
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Balanced
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 754
+        width: 445
+        height: 321
+      alignment: 9
+      pivot: {x: 0.64, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd8825a51c4164d45bdea1957d098a34
+      internalID: 1597514459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Scout
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 733
+        width: 447
+        height: 325
+      alignment: 9
+      pivot: {x: 0.64, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a1286801a63abfa4c85e96578181dade
+      internalID: -598251428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alert
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 194
+        width: 429
+        height: 316
+      alignment: 9
+      pivot: {x: 0.64, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b15a44b867cb9ce4bbd7326db012e4d1
+      internalID: -2109058083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sprinter
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 203
+        width: 473
+        height: 235
+      alignment: 9
+      pivot: {x: 0.64, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ceb09395d5eee84198227d09f587106
+      internalID: 1714527144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 0e9208a1aaff45742ad83a21a607c1c4
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Alert: -2109058083
+      Balanced: 1597514459
+      Scout: -598251428
+      Sprinter: 1714527144
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -41,10 +41,24 @@ namespace TeumsaeSwim
                 }
             }
             art.shape(terrainRoot, "Safe start ring", "ring", data.center(data.start), Vector2.one * 1.7f, new Color( .45f, .82f, .73f, .35f), 2);
-            art.label(terrainRoot, "수면을 향해 ↑", data.center(data.start) + Vector2.up * .78f, .24f, SwimArt.mint);
+            drawSafeRoom(data.start, "시작 · 안전구역");
+            drawSafeRoom(data.exit, "도착 · 안전구역");
             art.shape(terrainRoot, "Exit halo", "circle", data.center(data.exit), Vector2.one * 1.9f, new Color(.45f, .95f, .8f, .18f), 3);
             art.shape(terrainRoot, "Exit ring", "ring", data.center(data.exit), Vector2.one * 1.5f, SwimArt.mint, 4);
-            art.label(terrainRoot, "↑\n출구", data.center(data.exit), .42f, Color.white);
+            art.label(terrainRoot, "출구", data.center(data.exit), .42f, Color.white);
+        }
+
+        private void drawSafeRoom(int id, string title) //안전구역의 실제 경계와 안내 표시
+        {
+            Vector2 center = data.center(id); //안전방 중심
+            float size = data.tileSize * 3f; //안전방의 한 변 길이
+            art.shape(terrainRoot, "Safe water", "box", center, Vector2.one * size, new Color(.35f, .85f, .72f, .12f), -4);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                art.shape(terrainRoot, "Safe boundary", "box", center + Vector2.right * side * size * .5f, new Vector2(.035f, size), SwimArt.mint, 2);
+                art.shape(terrainRoot, "Safe boundary", "box", center + Vector2.up * side * size * .5f, new Vector2(size, .035f), SwimArt.mint, 2);
+            }
+            art.label(terrainRoot, title, center + Vector2.down * 1.5f, .28f, SwimArt.mint);
         }
 
         private void drawGrass(int id) //몸을 숨길 수 있는 수풀 표시
@@ -103,6 +117,16 @@ namespace TeumsaeSwim
 
         public bool canOccupy(Vector2 position, float radius, bool predator, bool squeeze) //몸체와 지형의 충돌 검사
         {
+            return bodyFits(position, radius, predator, squeeze, false);
+        }
+
+        public bool canOccupyProjectile(Vector2 position, float radius) //안전구역의 경계를 통과하는 미끼 충돌 검사
+        {
+            return bodyFits(position, radius, true, false, true);
+        }
+
+        private bool bodyFits(Vector2 position, float radius, bool predator, bool squeeze, bool projectile) //몸체 용도에 따른 지형과 안전구역 검사
+        {
             if (position.x < radius || position.y < radius || position.x > data.width * data.tileSize - radius || position.y > data.height * data.tileSize - radius) return false;
             int minX = Mathf.FloorToInt((position.x - radius) / data.tileSize); //검사 시작 열
             int maxX = Mathf.FloorToInt((position.x + radius) / data.tileSize); //검사 끝 열
@@ -112,7 +136,7 @@ namespace TeumsaeSwim
             for (int x = minX; x <= maxX; x++)
             {
                 int id = y * data.width + x; //검사 대상 칸
-                foreach (Rect obstacle in obstacles(id, predator, squeeze, false))
+                foreach (Rect obstacle in obstacles(id, predator, squeeze, false, projectile))
                     if (circleHits(position, radius, obstacle)) return false;
             }
             return true;
@@ -121,9 +145,9 @@ namespace TeumsaeSwim
         public Vector2 moveProjectile(Vector2 position, Vector2 delta, float radius, out Vector2 normal) //미끼의 첫 충돌 위치와 반사면 계산
         {
             normal = Vector2.zero;
-            if (canOccupy(position + delta, radius, true, false)) return position + delta;
-            bool blockedX = !canOccupy(position + new Vector2(delta.x, 0f), radius, true, false); //가로 방향 충돌
-            bool blockedY = !canOccupy(position + new Vector2(0f, delta.y), radius, true, false); //세로 방향 충돌
+            if (canOccupyProjectile(position + delta, radius)) return position + delta;
+            bool blockedX = !canOccupyProjectile(position + new Vector2(delta.x, 0f), radius); //가로 방향 충돌
+            bool blockedY = !canOccupyProjectile(position + new Vector2(0f, delta.y), radius); //세로 방향 충돌
             normal = new Vector2(blockedX ? -Mathf.Sign(delta.x) : 0f, blockedY ? -Mathf.Sign(delta.y) : 0f).normalized;
             if (normal.sqrMagnitude < .01f) normal = -delta.normalized;
             float lower = 0f; //충돌하지 않는 이동 비율
@@ -131,18 +155,18 @@ namespace TeumsaeSwim
             for (int i = 0; i < 10; i++)
             {
                 float middle = (lower + upper) * .5f; //이번에 검사할 이동 비율
-                if (canOccupy(position + delta * middle, radius, true, false)) lower = middle;
+                if (canOccupyProjectile(position + delta * middle, radius)) lower = middle;
                 else upper = middle;
             }
             return position + delta * lower;
         }
 
-        private IEnumerable<Rect> obstacles(int id, bool predator, bool squeeze, bool sight) //용도에 따라 다른 장애물 영역
+        private IEnumerable<Rect> obstacles(int id, bool predator, bool squeeze, bool sight, bool projectile = false) //용도에 따라 다른 장애물 영역
         {
             MazeCell cell = data.cells[id]; //대상 지형
             Vector2 origin = data.center(id) - Vector2.one * data.tileSize * .5f; //칸의 왼쪽 아래
             float tile = data.tileSize; //지형 크기
-            if (cell.kind == TerrainKind.Wall || (cell.kind == TerrainKind.Gap && !sight && (predator || !squeeze)))
+            if (cell.kind == TerrainKind.Wall || (cell.safeZone && predator && !projectile && !sight) || (cell.kind == TerrainKind.Gap && !sight && (predator || !squeeze)))
                 yield return new Rect(origin.x, origin.y, tile, tile);
             else if (cell.kind == TerrainKind.Net && !cell.netOpen && !sight)
                 yield return cell.horizontal ? new Rect(origin.x + tile * .5f - .08f, origin.y, .16f, tile) : new Rect(origin.x, origin.y + tile * .5f - .08f, tile, .16f);

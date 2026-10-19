@@ -19,7 +19,8 @@ namespace TeumsaeSwim
         public Sprite sprite(string kind) //코드로 만든 도형 이미지 재사용
         {
             if (sprites.TryGetValue(kind, out Sprite cached)) return cached;
-            const int size = 96; //생성 이미지 해상도
+            int size = kind.StartsWith("ui-") ? 256 : 96; //큰 UI 원형은 충분한 해상도로 생성
+            string geometry = kind.StartsWith("ui-") ? kind.Substring(3) : kind; //UI와 월드에서 공유할 도형 종류
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false); //투명 도형 텍스처
             texture.name = "Swim " + kind;
             texture.filterMode = FilterMode.Bilinear;
@@ -31,20 +32,22 @@ namespace TeumsaeSwim
                 float u = (x + .5f) / size * 2f - 1f; //가로 정규화 좌표
                 float v = (y + .5f) / size * 2f - 1f; //세로 정규화 좌표
                 float alpha; //픽셀 투명도
-                if (kind == "circle") alpha = Mathf.Clamp01((1f - Mathf.Sqrt(u * u + v * v)) * size * .5f);
+                if (geometry == "circle") alpha = Mathf.Clamp01((1f - Mathf.Sqrt(u * u + v * v)) * size * .5f);
                 else if (kind == "triangle") alpha = Mathf.Clamp01(Mathf.Min(1f - Mathf.Abs(v), (u + 1f) * .5f - Mathf.Abs(v)) * size);
-                else if (kind == "ring") alpha = Mathf.Clamp01((.055f - Mathf.Abs(Mathf.Sqrt(u * u + v * v) - .91f)) * size);
-                else if (kind == "round")
+                else if (geometry == "ring") alpha = Mathf.Clamp01((.035f - Mathf.Abs(Mathf.Sqrt(u * u + v * v) - .94f)) * size);
+                else if (kind == "round" || kind == "pill")
                 {
-                    Vector2 edge = new Vector2(Mathf.Max(Mathf.Abs(u) - .72f, 0f), Mathf.Max(Mathf.Abs(v) - .72f, 0f)); //둥근 모서리 거리
-                    alpha = Mathf.Clamp01((.28f - edge.magnitude) * size);
+                    float radius = kind == "pill" ? .95f : .28f; //UI와 지형의 개별 모서리 반경
+                    Vector2 edge = new Vector2(Mathf.Max(Mathf.Abs(u) - (1f - radius), 0f), Mathf.Max(Mathf.Abs(v) - (1f - radius), 0f)); //둥근 모서리 거리
+                    alpha = Mathf.Clamp01((radius - edge.magnitude) * size);
                 }
                 else alpha = 1f;
                 pixels[y * size + x] = new Color(1f, 1f, 1f, alpha);
             }
             texture.SetPixels(pixels);
             texture.Apply(false, true);
-            Sprite generated = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), size); //월드 한 칸 크기의 원본
+            Vector4 border = kind == "pill" ? Vector4.one * 44f : kind == "round" ? Vector4.one * 14f : Vector4.zero; //UI 크기 변화에도 유지할 모서리
+            Sprite generated = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), size, 0, SpriteMeshType.FullRect, border); //월드 한 칸 크기의 원본
             generated.name = "Swim " + kind;
             sprites[kind] = generated;
             return generated;

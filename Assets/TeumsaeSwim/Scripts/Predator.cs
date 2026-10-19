@@ -10,19 +10,21 @@ namespace TeumsaeSwim
         [SerializeField] private PredatorVisualComponent visual; //물고기와 시야 표시 구성 요소
         private Maze maze; //지형 진입점
         private Player player; //플레이어 진입점
+        public PredatorKind kind { get; private set; } //현재 포식자 종류
         public PredatorState state => intelligence.state; //외부에 표시할 행동 상태
         public bool seesPlayer { get; private set; } //이번 프레임 발견 결과
         public Vector2 position => transform.position; //현재 위치
         public float radius => movement.radius; //접촉 반경
         public event Action<SwimCue> cue; //발견과 추격 효과음 요청
 
-        public void initialize(Maze world, Player target, int home, SwimDifficulty difficulty, int seed) //포식자 구성 요소 연결
+        public void initialize(Maze world, Player target, int home, SwimDifficulty difficulty, int seed, PredatorTypeProfile profile = null) //종류 설정을 담당 구성 요소에 전달
         {
             maze = world;
             player = target;
-            intelligence.initialize();
-            movement.initialize(maze, home, difficulty, seed);
-            visual.initialize();
+            kind = profile != null ? profile.type : PredatorKind.Balanced;
+            intelligence.initialize(profile);
+            movement.initialize(maze, home, difficulty, seed, profile);
+            visual.initialize(profile);
             visual.tick(maze, movement.facing, state, 0f, intelligence.range, intelligence.angle);
         }
 
@@ -37,7 +39,7 @@ namespace TeumsaeSwim
             if (state == PredatorState.Lure && baitTarget != null && Vector2.Distance(position, baitTarget.position) < .65f) maze.consumeBait(baitTarget);
             if (state != before && (state == PredatorState.Notice || state == PredatorState.Lure)) cue?.Invoke(SwimCue.Notice);
             if (state != before && state == PredatorState.Chase) cue?.Invoke(SwimCue.Chase);
-            visual.tick(maze, movement.facing, state, intelligence.noticeFraction, intelligence.range, intelligence.angle);
+            visual.tick(maze, movement.facing, state, intelligence.noticeFraction, intelligence.range, intelligence.angle, deltaTime);
         }
     }
 }

@@ -8,7 +8,8 @@ namespace TeumsaeSwim
     public enum SwimDifficulty { Practice, Normal, Challenge }
     public enum TerrainKind { Water, Wall, Gap, Net, Grass }
     public enum PredatorState { Patrol, Notice, Chase, Return, Lure }
-    public enum SwimCue { Bait, Squeeze, Tear, Open, Notice, Chase, Win, Lose }
+    public enum PredatorKind { Balanced, Scout, Alert, Sprinter } //종류별 능력치와 그림의 식별자
+    public enum SwimCue { Bait, Squeeze, Tear, Open, Notice, Chase, Win, Lose, Pickup }
 
     [Serializable]
     public sealed class MazeCell
@@ -17,6 +18,7 @@ namespace TeumsaeSwim
         public bool horizontal; //통로의 가로 방향 여부
         public float netProgress; //그물의 누적 작업 시간
         public bool netOpen; //그물 개방 여부
+        public bool safeZone; //포식자의 진입과 포획을 막는 안전구역
     }
 
     public sealed class MazeData
@@ -28,6 +30,7 @@ namespace TeumsaeSwim
         public int start; //시작 칸
         public int exit; //출구 칸
         public MazeCell[] cells; //전체 지형 데이터
+        public int[] exitDistances; //출구까지의 실제 통로 거리
         public readonly List<int> homes = new List<int>(); //포식자 시작 칸
         public readonly List<int> route = new List<int>(); //검증된 출구 경로
 
@@ -73,7 +76,41 @@ namespace TeumsaeSwim
         public bool passable(int id, bool predator) //길찾기의 통행 가능 여부
         {
             if (id < 0 || id >= cells.Length || cells[id].kind == TerrainKind.Wall) return false;
-            return !predator || (cells[id].kind != TerrainKind.Gap && (cells[id].kind != TerrainKind.Net || cells[id].netOpen));
+            return !predator || (!cells[id].safeZone && cells[id].kind != TerrainKind.Gap && (cells[id].kind != TerrainKind.Net || cells[id].netOpen));
+        }
+
+        public int[] distancesFrom(int origin, bool predator = false) //한 번의 탐색으로 모든 칸까지의 통로 거리 계산
+        {
+            int[] distances = new int[cells.Length]; //도달하지 못한 칸은 음수로 유지
+            Array.Fill(distances, -1);
+            if (!passable(origin, predator)) return distances;
+            var queue = new Queue<int>(); //탐색할 칸
+            queue.Enqueue(origin);
+            distances[origin] = 0;
+            while (queue.Count > 0)
+            {
+                int id = queue.Dequeue(); //현재 칸
+                foreach (int next in neighbors(id))
+                {
+                    if (distances[next] >= 0 || !passable(next, predator) || !gapAllows(id, next) || !gapAllows(next, id)) continue;
+                    distances[next] = distances[id] + 1;
+                    queue.Enqueue(next);
+                }
+            }
+            return distances;
+        }
+
+        public float progressAt(Vector2 position) //출구 방향과 관계없이 남은 통로 거리로 진행률 계산
+        {
+            int id = cellAt(position); //현재 위치의 칸
+            if (id < 0 || exitDistances == null || exitDistances[id] < 0 || exitDistances[start] <= 0) return 0f;
+            float remaining = exitDistances[id] + Vector2.Distance(position, center(id)) / tileSize; //현재 칸을 거쳐 출구까지의 거리
+            foreach (int next in neighbors(id))
+            {
+                if (exitDistances[next] < 0 || !gapAllows(id, next) || !gapAllows(next, id)) continue;
+                remaining = Mathf.Min(remaining, exitDistances[next] + Vector2.Distance(position, center(next)) / tileSize);
+            }
+            return Mathf.Clamp01(1f - remaining / exitDistances[start]);
         }
 
         private bool gapAllows(int from, int to) //틈의 실제 통로 방향과 일치하는 경로만 허용

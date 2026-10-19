@@ -133,6 +133,10 @@ GameObject:
   - component: {fileID: 625983713}
   - component: {fileID: 625983712}
   - component: {fileID: 625983711}
+  - component: {fileID: 625983717}
+  - component: {fileID: 625983720}
+  - component: {fileID: 625983719}
+  - component: {fileID: 625983718}
   m_Layer: 0
   m_Name: SwimGame
   m_TagString: Untagged
@@ -150,12 +154,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 879e11dc617396c48936648ccbc47142, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.SwimGame
   session: {fileID: 625983715}
   maze: {fileID: 634707481}
   player: {fileID: 1363019898}
   predatorPrefab: {fileID: 7581994879904691554, guid: 8d818c8e3232bb944a2a9935f675f1d1, type: 3}
+  roster: {fileID: 625983717}
   cameraFollow: {fileID: 770461726}
   ui: {fileID: 625983714}
   audioComponent: {fileID: 625983712}
@@ -169,7 +174,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c98cea5270849243a0112fe7ece082f, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameAudioComponent
   source: {fileID: 625983713}
   volume: 0.22
@@ -280,9 +285,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82a67ceb223196f4782825833744b8ab, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameUIComponent
   art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  style: {fileID: 625983720}
+  hud: {fileID: 625983719}
+  menus: {fileID: 625983718}
 --- !u!114 &625983715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,8 +301,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca016123bf6e8a44abb251fd4ec3447f, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameSessionComponent
+  practiceTimeGoal: 180
+  normalTimeGoal: 240
+  challengeTimeGoal: 300
 --- !u!4 &625983716
 Transform:
   m_ObjectHideFlags: 0
@@ -310,6 +321,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &625983717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625983710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60162c5b681f1cb49a957be81a704861, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorRosterComponent
+  profiles:
+  - {fileID: 11400000, guid: 6147af91ed80c1a4081defd050190ef3, type: 2}
+  - {fileID: 11400000, guid: 7b1cc481ee81d5a4ba1f7ebdb38dcb47, type: 2}
+  - {fileID: 11400000, guid: 2e331a4732fee78458957a4dbc976050, type: 2}
+  - {fileID: 11400000, guid: 2b614941b2045b14f9e0d8117be2a979, type: 2}
+--- !u!114 &625983718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625983710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2f95855b45e364eb2e9571652ec89c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameMenuComponent
+--- !u!114 &625983719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625983710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e67415ee95b9f9b4997c56a333e6a47a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameHUDComponent
+--- !u!114 &625983720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625983710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7631da50fe93c540ab3df270564a291, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameUIStyleComponent
+  oceanBackground: {fileID: 21300000, guid: bfa8812b3ddbb34408575a57b189f3d4, type: 3}
+  titleLogo: {fileID: 21300000, guid: bfe245c11f9a4af4289471888c149547, type: 3}
+  playerFish: {fileID: 21300000, guid: 9bd60867933a540489ecea551b241275, type: 3}
 --- !u!1 &634707480
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,6 +390,7 @@ GameObject:
   - component: {fileID: 634707482}
   - component: {fileID: 634707481}
   - component: {fileID: 634707485}
+  - component: {fileID: 634707486}
   m_Layer: 0
   m_Name: Maze
   m_TagString: Untagged
@@ -340,11 +408,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a4206e47f3ba0443b42c2ef39166f50, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.Maze
   generation: {fileID: 634707483}
   terrain: {fileID: 634707482}
   bait: {fileID: 634707485}
+  items: {fileID: 634707486}
 --- !u!114 &634707482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,7 +424,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f45f963ae923f03428ad9ce9dce1f2ff, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeTerrainComponent
   art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
   netWorkTime: 2
@@ -370,12 +439,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89dd0d80d170e874caa6840e4b0a2186, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeGenerationComponent
   tileSize: 2.2
-  practiceModules: 8
-  normalModules: 10
-  challengeModules: 12
+  practiceSize: 25
+  normalSize: 31
+  challengeSize: 37
+  loopRatio: 0.045
   practicePredators: 2
   normalPredators: 4
   challengePredators: 6
@@ -413,6 +483,23 @@ MonoBehaviour:
   attractDistance: 8.8
   baitDuration: 8
   bodyRadius: 0.18
+--- !u!114 &634707486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634707480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43411ce30f821184da9526a258413790, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeItemComponent
+  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  pickupRadius: 0.3
+  minimumDetour: 6
+  endpointClearance: 6
+  predatorClearance: 2
 --- !u!1 &770461725
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,7 +529,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59b4a4349bd173944bcad3fccb4ef32e, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.CameraFollowComponent
   gameCamera: {fileID: 770461727}
   viewHeight: 13.2
@@ -552,7 +639,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b34b708a2bf180d489bedc54a163a286, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.Player
   input: {fileID: 1363019902}
   movement: {fileID: 1363019901}
@@ -568,9 +655,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b80963235e99164cb378c5a2036bd29, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PlayerVisualComponent
   art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  fishSprite: {fileID: 21300000, guid: 9bd60867933a540489ecea551b241275, type: 3}
 --- !u!114 &1363019900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -581,7 +669,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23c3997c67647f949b054ab636810243, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PlayerInteractionComponent
   initialBaits: 2
 --- !u!114 &1363019901
@@ -594,7 +682,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f769e40a3f3b4849940dacf4ba64c17, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PlayerMovementComponent
   swimSpeed: 3.35
   squeezeSpeed: 1.65
@@ -611,7 +699,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f75b75716ce419849b83c42dcd89a8ef, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PlayerInputComponent
 --- !u!4 &1363019903
 Transform:

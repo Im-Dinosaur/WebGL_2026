@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca4498dfbac5d44ab3945971d8ab0d4, type: 3}
+  m_Name: Sprinter
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorTypeProfile
+  kind: 3
+  displayName: "\uCD94\uACA9\uD615"
+  description: "\uBE60\uB974\uAC8C \uCAD3\uC9C0\uB9CC \uBC1C\uACAC \uB300\uAE30\uAC00
+    \uAE38\uC5B4\uC694"
+  accent: {r: 1, g: 0.56078434, b: 0.77254903, a: 1}
+  fishSprite: {fileID: 1714527144, guid: 80b35e6b8e8d3bc448caf85aea1502a7, type: 3}
+  sightDistance: 3.5
+  noticeDuration: 1.2
+  patrolMultiplier: 1
+  chaseMultiplier: 1.3
+  lureMultiplier: 1

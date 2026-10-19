@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca4498dfbac5d44ab3945971d8ab0d4, type: 3}
+  m_Name: Scout
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PredatorTypeProfile
+  kind: 1
+  displayName: "\uC815\uCC30\uD615"
+  description: "\uBA40\uB9AC \uBCF4\uC9C0\uB9CC \uC774\uB3D9\uC774 \uB290\uB824\uC694"
+  accent: {r: 0.3882353, g: 0.76862746, b: 1, a: 1}
+  fishSprite: {fileID: -598251428, guid: 80b35e6b8e8d3bc448caf85aea1502a7, type: 3}
+  sightDistance: 5.6
+  noticeDuration: 1.1
+  patrolMultiplier: 0.8
+  chaseMultiplier: 0.8
+  lureMultiplier: 0.8

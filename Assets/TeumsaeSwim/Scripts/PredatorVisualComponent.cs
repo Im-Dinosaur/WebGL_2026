@@ -5,24 +5,24 @@ namespace TeumsaeSwim
     public sealed class PredatorVisualComponent : MonoBehaviour
     {
         [SerializeField] private SwimArt art; //포식자 표시 자원
+        [SerializeField] private bool showTypeName = true; //색과 함께 종류 이름도 표시
         private Transform body; //회전할 물고기 그림
         private TextMesh marker; //발견과 복귀 상태 표시
         private Transform gauge; //발견 누적 시간 표시
         private Mesh cone; //지형에 잘리는 시야 부채꼴
         private MeshRenderer coneRenderer; //시야 렌더러
         private Material coneMaterial; //포식자별 시야 색상 재질
+        private float animationTime; //일시정지에 함께 멈추는 헤엄 시간
         private readonly Vector3[] vertices = new Vector3[26]; //시야 꼭짓점
 
-        public void initialize() //물고기와 상태 표시 구성
+        public void initialize(PredatorTypeProfile profile = null) //종류별 물고기와 상태 표시 구성
         {
             body = new GameObject("Predator body").transform;
             body.SetParent(transform, false);
-            var tail = art.shape(body, "Tail", "triangle", new Vector2(-.55f, 0), new Vector2(.5f, .62f), SwimArt.coral, 9); //포식자 꼬리
-            tail.transform.localRotation = Quaternion.Euler(0, 0, 180f);
-            art.shape(body, "Body", "circle", Vector2.zero, new Vector2(1.1f, .72f), new Color32(157, 105, 140, 255), 10);
-            art.shape(body, "Fin", "triangle", new Vector2(-.1f, .38f), new Vector2(.43f, .4f), SwimArt.coral, 9);
-            art.shape(body, "Eye white", "circle", new Vector2(.31f, .1f), Vector2.one * .2f, Color.white, 11);
-            art.shape(body, "Eye", "circle", new Vector2(.35f, .1f), Vector2.one * .1f, SwimArt.ink, 12);
+            if (profile != null && profile.sprite != null) drawSpecies(profile);
+            else drawFallback();
+            if (profile != null && showTypeName) art.label(transform, profile.title, new Vector2(0, -.83f), .25f, profile.color, 17);
+            animationTime = 0;
             marker = art.label(transform, "", new Vector2(0, .8f), .62f, SwimArt.yellow, 17);
             gauge = art.shape(transform, "Notice gauge", "round", new Vector2(0, 1.3f), new Vector2(.8f, .07f), SwimArt.yellow, 16).transform;
             var coneObject = new GameObject("Field of view"); //시야 표시 오브젝트
@@ -45,8 +45,33 @@ namespace TeumsaeSwim
             cone.uv = uv;
         }
 
-        public void tick(Maze maze, Vector2 facing, PredatorState state, float progress, float range, float angle) //시야와 발견 표시 갱신
+        private void drawSpecies(PredatorTypeProfile profile) //시안에서 만든 투명 스프라이트를 몸체 크기에 맞춰 표시
         {
+            var fish = new GameObject("Species fish"); //종류별 그림 오브젝트
+            fish.transform.SetParent(body, false);
+            var renderer = fish.AddComponent<SpriteRenderer>(); //종류 그림 렌더러
+            renderer.sprite = profile.sprite;
+            renderer.sharedMaterial = art.material;
+            renderer.sortingOrder = 10;
+            float width = profile.type == PredatorKind.Sprinter ? 1.65f : 1.45f; //꼬리를 포함한 그림의 가로 크기
+            fish.transform.localScale = Vector3.one * (width / profile.sprite.bounds.size.x);
+        }
+
+        private void drawFallback() //종류 설정이 없는 기존 호출의 기본 도형 유지
+        {
+            var tail = art.shape(body, "Tail", "triangle", new Vector2(-.55f, 0), new Vector2(.5f, .62f), SwimArt.coral, 9); //포식자 꼬리
+            tail.transform.localRotation = Quaternion.Euler(0, 0, 180f);
+            art.shape(body, "Body", "circle", Vector2.zero, new Vector2(1.1f, .72f), new Color32(157, 105, 140, 255), 10);
+            art.shape(body, "Fin", "triangle", new Vector2(-.1f, .38f), new Vector2(.43f, .4f), SwimArt.coral, 9);
+            art.shape(body, "Eye white", "circle", new Vector2(.31f, .1f), Vector2.one * .2f, Color.white, 11);
+            art.shape(body, "Eye", "circle", new Vector2(.35f, .1f), Vector2.one * .1f, SwimArt.ink, 12);
+        }
+
+        public void tick(Maze maze, Vector2 facing, PredatorState state, float progress, float range, float angle, float deltaTime = 0f) //헤엄과 시야 및 발견 표시 갱신
+        {
+            animationTime += Mathf.Max(0f, deltaTime);
+            float pulse = Mathf.Sin(animationTime * (state == PredatorState.Chase ? 15f : 7f)) * .025f; //작고 부드러운 헤엄 변형
+            body.localScale = new Vector3(1f + pulse, (1f - pulse) * (facing.x < 0f ? -1f : 1f), 1f);
             float heading = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg; //물고기 방향 각도
             body.localRotation = Quaternion.Euler(0, 0, heading);
             marker.text = state == PredatorState.Chase ? "!" : state == PredatorState.Notice || state == PredatorState.Return || state == PredatorState.Lure ? "?" : "";
@@ -67,8 +92,8 @@ namespace TeumsaeSwim
 
         private void OnDestroy() //동적으로 생성한 메시와 재질 정리
         {
-            if (cone != null) Destroy(cone);
-            if (coneMaterial != null) Destroy(coneMaterial);
+            if (cone != null) { if (Application.isPlaying) Destroy(cone); else DestroyImmediate(cone); }
+            if (coneMaterial != null) { if (Application.isPlaying) Destroy(coneMaterial); else DestroyImmediate(coneMaterial); }
         }
     }
 }

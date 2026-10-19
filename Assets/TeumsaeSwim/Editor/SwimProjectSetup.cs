@@ -42,13 +42,15 @@ namespace TeumsaeSwim.Editor
             cameraObject.transform.position = new Vector3(0, 0, -10);
             link(cameraObject.GetComponent<CameraFollowComponent>(), "gameCamera", camera);
 
-            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(MazeBaitComponent), typeof(Maze)); //미로 조립
+            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(MazeBaitComponent), typeof(MazeItemComponent), typeof(Maze)); //미로 조립
             Maze maze = mazeObject.GetComponent<Maze>(); //미로 진입점
             link(maze, "generation", mazeObject.GetComponent<MazeGenerationComponent>());
             link(maze, "terrain", mazeObject.GetComponent<MazeTerrainComponent>());
             link(maze, "bait", mazeObject.GetComponent<MazeBaitComponent>());
+            link(maze, "items", mazeObject.GetComponent<MazeItemComponent>());
             link(mazeObject.GetComponent<MazeTerrainComponent>(), "art", art);
             link(mazeObject.GetComponent<MazeBaitComponent>(), "art", art);
+            link(mazeObject.GetComponent<MazeItemComponent>(), "art", art);
 
             var playerObject = new GameObject("Player", typeof(PlayerInputComponent), typeof(PlayerMovementComponent), typeof(PlayerInteractionComponent), typeof(PlayerVisualComponent), typeof(Player)); //플레이어 조립
             Player player = playerObject.GetComponent<Player>(); //플레이어 진입점
@@ -83,6 +85,8 @@ namespace TeumsaeSwim.Editor
             link(game, "audioComponent", gameObject.GetComponent<GameAudioComponent>());
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), scenePath);
             AssetDatabase.SaveAssets();
+            if (File.Exists(PredatorTypeSetup.atlasPath)) PredatorTypeSetup.connect();
+            if (File.Exists("Assets/TeumsaeSwim/Art/UI/OceanHome.png")) SwimUISetup.connect();
             Debug.Log("TEUMSAE_SETUP_OK: " + scenePath);
         }
 
@@ -107,7 +111,7 @@ namespace TeumsaeSwim.Editor
             bool background = PlayerSettings.runInBackground; //복구할 백그라운드 설정
             try
             {
-                PlayerSettings.productName = "Teumsae Swim";
+                PlayerSettings.productName = "숨바꼬기";
                 PlayerSettings.WebGL.template = "PROJECT:TeumsaeSwim";
                 PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
                 PlayerSettings.WebGL.decompressionFallback = true;
@@ -153,9 +157,9 @@ namespace TeumsaeSwim.Editor
             link(maze, "bait", bait);
             link(bait, "art", AssetDatabase.LoadAssetAtPath<SwimArt>(artPath));
             SerializedObject generation = new SerializedObject(maze.GetComponent<MazeGenerationComponent>()); //기존 생성기 설정
-            generation.FindProperty("practiceModules").intValue = 8;
-            generation.FindProperty("normalModules").intValue = 10;
-            generation.FindProperty("challengeModules").intValue = 12;
+            generation.FindProperty("practiceSize").intValue = 25;
+            generation.FindProperty("normalSize").intValue = 31;
+            generation.FindProperty("challengeSize").intValue = 37;
             generation.FindProperty("practicePredators").intValue = 2;
             generation.FindProperty("normalPredators").intValue = 4;
             generation.FindProperty("challengePredators").intValue = 6;
@@ -178,6 +182,27 @@ namespace TeumsaeSwim.Editor
         public static void upgradeAndVerify() //기존 자원 갱신과 규칙 검증 연결
         {
             applyFeedbackUpdate();
+            verify();
+        }
+
+        [MenuItem("Teumsae Swim/5. Connect pearl item")]
+        public static void applyItemUpdate() //기존 난이도와 씬 설정을 보존하며 진주 구성 요소만 연결
+        {
+            EditorSceneManager.OpenScene(scenePath);
+            Maze maze = UnityEngine.Object.FindFirstObjectByType<Maze>(); //기존 미로 진입점
+            MazeItemComponent items = maze.GetComponent<MazeItemComponent>(); //연결할 아이템 구성 요소
+            if (items == null) items = maze.gameObject.AddComponent<MazeItemComponent>();
+            link(maze, "items", items);
+            link(items, "art", AssetDatabase.LoadAssetAtPath<SwimArt>(artPath));
+            EditorSceneManager.MarkSceneDirty(maze.gameObject.scene);
+            EditorSceneManager.SaveScene(maze.gameObject.scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("TEUMSAE_ITEM_UPDATE_OK");
+        }
+
+        public static void connectItemAndVerify() //로컬 씬 연결과 아이템을 포함한 전체 규칙 검증
+        {
+            applyItemUpdate();
             verify();
         }
 
