@@ -9,11 +9,7 @@ namespace TeumsaeSwim
         private Transform body; //회전할 물고기 그림
         private TextMesh marker; //발견과 복귀 상태 표시
         private Transform gauge; //발견 누적 시간 표시
-        private Mesh cone; //지형에 잘리는 시야 부채꼴
-        private MeshRenderer coneRenderer; //시야 렌더러
-        private Material coneMaterial; //포식자별 시야 색상 재질
         private float animationTime; //일시정지에 함께 멈추는 헤엄 시간
-        private readonly Vector3[] vertices = new Vector3[26]; //시야 꼭짓점
 
         public void initialize(PredatorTypeProfile profile = null) //종류별 물고기와 상태 표시 구성
         {
@@ -25,24 +21,6 @@ namespace TeumsaeSwim
             animationTime = 0;
             marker = art.label(transform, "", new Vector2(0, .8f), .62f, SwimArt.yellow, 17);
             gauge = art.shape(transform, "Notice gauge", "round", new Vector2(0, 1.3f), new Vector2(.8f, .07f), SwimArt.yellow, 16).transform;
-            var coneObject = new GameObject("Field of view"); //시야 표시 오브젝트
-            coneObject.transform.SetParent(transform, false);
-            cone = new Mesh { name = "Clipped field of view" };
-            cone.MarkDynamic();
-            coneObject.AddComponent<MeshFilter>().sharedMesh = cone;
-            coneRenderer = coneObject.AddComponent<MeshRenderer>();
-            coneMaterial = new Material(art.material);
-            coneRenderer.sharedMaterial = coneMaterial;
-            coneRenderer.sortingOrder = 0;
-            int[] triangles = new int[24 * 3]; //부채꼴 삼각형 인덱스
-            for (int i = 0; i < 24; i++) { triangles[i * 3] = 0; triangles[i * 3 + 1] = i + 1; triangles[i * 3 + 2] = i + 2; }
-            cone.vertices = vertices;
-            cone.triangles = triangles;
-            var colors = new Color[vertices.Length]; //시야 메시의 기본 색
-            var uv = new Vector2[vertices.Length]; //공용 재질의 텍스처 좌표
-            for (int i = 0; i < colors.Length; i++) { colors[i] = Color.white; uv[i] = Vector2.one * .5f; }
-            cone.colors = colors;
-            cone.uv = uv;
         }
 
         private void drawSpecies(PredatorTypeProfile profile) //시안에서 만든 투명 스프라이트를 몸체 크기에 맞춰 표시
@@ -67,7 +45,7 @@ namespace TeumsaeSwim
             art.shape(body, "Eye", "circle", new Vector2(.35f, .1f), Vector2.one * .1f, SwimArt.ink, 12);
         }
 
-        public void tick(Maze maze, Vector2 facing, PredatorState state, float progress, float range, float angle, float deltaTime = 0f) //헤엄과 시야 및 발견 표시 갱신
+        public void tick(Vector2 facing, PredatorState state, float progress, float deltaTime = 0f) //헤엄과 발견 신호 및 진행 게이지 갱신
         {
             animationTime += Mathf.Max(0f, deltaTime);
             float pulse = Mathf.Sin(animationTime * (state == PredatorState.Chase ? 15f : 7f)) * .025f; //작고 부드러운 헤엄 변형
@@ -78,22 +56,6 @@ namespace TeumsaeSwim
             marker.color = state == PredatorState.Chase ? SwimArt.coral : SwimArt.yellow;
             gauge.gameObject.SetActive(state == PredatorState.Notice);
             gauge.localScale = new Vector3(Mathf.Clamp01(progress) * .8f, .07f, 1f);
-            Color color = state == PredatorState.Chase ? new Color(1f, .3f, .25f, .2f) : new Color(1f, .8f, .35f, .14f); //행동별 시야 색
-            coneMaterial.SetColor("_Color", color);
-            for (int i = 0; i <= 24; i++)
-            {
-                float rayAngle = (heading - angle * .5f + angle * i / 24f) * Mathf.Deg2Rad; //시야 경계의 방향
-                Vector2 direction = new Vector2(Mathf.Cos(rayAngle), Mathf.Sin(rayAngle)); //시야 광선 방향
-                vertices[i + 1] = direction * maze.rayDistance(transform.position, direction, range);
-            }
-            cone.vertices = vertices;
-            cone.RecalculateBounds();
-        }
-
-        private void OnDestroy() //동적으로 생성한 메시와 재질 정리
-        {
-            if (cone != null) { if (Application.isPlaying) Destroy(cone); else DestroyImmediate(cone); }
-            if (coneMaterial != null) { if (Application.isPlaying) Destroy(coneMaterial); else DestroyImmediate(coneMaterial); }
         }
     }
 }

@@ -362,6 +362,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e67415ee95b9f9b4997c56a333e6a47a, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameHUDComponent
+  baitFullDragDistance: 90
+  baitCancelRadius: 12
 --- !u!114 &625983720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +393,7 @@ GameObject:
   - component: {fileID: 634707481}
   - component: {fileID: 634707485}
   - component: {fileID: 634707486}
+  - component: {fileID: 634707487}
   m_Layer: 0
   m_Name: Maze
   m_TagString: Untagged
@@ -412,6 +415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.Maze
   generation: {fileID: 634707483}
   terrain: {fileID: 634707482}
+  visual: {fileID: 634707487}
   bait: {fileID: 634707485}
   items: {fileID: 634707486}
 --- !u!114 &634707482
@@ -426,7 +430,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f45f963ae923f03428ad9ce9dce1f2ff, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeTerrainComponent
-  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
   netWorkTime: 2
   gapWidth: 0.66
 --- !u!114 &634707483
@@ -479,6 +482,7 @@ MonoBehaviour:
   art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
   launchSpeed: 8
   launchDistance: 6.6
+  minimumLaunchDistance: 1.1
   bounceDistance: 1.1
   attractDistance: 8.8
   baitDuration: 8
@@ -500,6 +504,20 @@ MonoBehaviour:
   minimumDetour: 6
   endpointClearance: 6
   predatorClearance: 2
+--- !u!114 &634707487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634707480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 610eec65a81f5034e99377028349814b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeTileVisualComponent
+  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  tiles: {fileID: 11400000, guid: d8593ad799504c8409fc2985fa3ba5ce, type: 2}
 --- !u!1 &770461725
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,6 +640,7 @@ GameObject:
   - component: {fileID: 1363019900}
   - component: {fileID: 1363019899}
   - component: {fileID: 1363019898}
+  - component: {fileID: 1363019904}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -645,6 +664,7 @@ MonoBehaviour:
   movement: {fileID: 1363019901}
   interaction: {fileID: 1363019900}
   visual: {fileID: 1363019899}
+  baitAim: {fileID: 1363019904}
 --- !u!114 &1363019899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -716,6 +736,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1363019904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363019897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2ad5fff2cb6bbf48a285722f9e586ce, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.PlayerBaitAimComponent
+  art: {fileID: 11400000, guid: cc5a7a880ec6b1b47bf8047639493caf, type: 2}
+  dotSpacing: 0.24
+  dotSize: 0.07
+  aimColor: {r: 1, g: 0.86, b: 0.43, a: 0.9}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

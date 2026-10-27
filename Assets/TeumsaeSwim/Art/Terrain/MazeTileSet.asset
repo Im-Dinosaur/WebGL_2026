@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ea15a66cbe2b084794793b022a83000, type: 3}
+  m_Name: MazeTileSet
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.MazeTileSet
+  water: {fileID: 1974587385, guid: d3d149a915b626146999e45edfbc9b48, type: 3}
+  rock: {fileID: -1670519669, guid: d3d149a915b626146999e45edfbc9b48, type: 3}
+  grass: {fileID: 1995063212, guid: 567ea87931beae947897f877e31cfd13, type: 3}
+  coral: {fileID: -466187861, guid: 567ea87931beae947897f877e31cfd13, type: 3}
+  closedNet: {fileID: 1166175349, guid: 567ea87931beae947897f877e31cfd13, type: 3}
+  openNet: {fileID: -434027543, guid: 567ea87931beae947897f877e31cfd13, type: 3}
+  waterTint: {r: 0.62, g: 0.78, b: 0.82, a: 0.62}
+  cornerRadius: 0.07

@@ -5,100 +5,15 @@ namespace TeumsaeSwim
 {
     public sealed class MazeTerrainComponent : MonoBehaviour
     {
-        [SerializeField] private SwimArt art; //지형과 안내 그림
         [SerializeField] private float netWorkTime = 2f; //그물 개방에 필요한 누적 시간
         [SerializeField] private float gapWidth = .66f; //틈새의 유효 너비
         private MazeData data; //현재 지형 데이터
-        private Transform terrainRoot; //재생성할 지형의 루트
-        private readonly Dictionary<int, Transform> nets = new Dictionary<int, Transform>(); //열리지 않은 그물 표시
+        public float gapSize => gapWidth; //표시와 공유할 통로의 실제 너비
+        public float hidingRadius => .97f; //표시와 공유할 원형 은신 범위
 
-        public void initialize(MazeData mazeData) //지형 데이터와 표시 초기화
+        public void initialize(MazeData mazeData) //지형 판정 데이터 초기화
         {
-            if (terrainRoot != null) { terrainRoot.gameObject.SetActive(false); removeGenerated(terrainRoot.gameObject); }
             data = mazeData;
-            nets.Clear();
-            terrainRoot = new GameObject("Generated terrain").transform;
-            terrainRoot.SetParent(transform, false);
-            float tile = data.tileSize; //지형 한 칸 크기
-            art.shape(terrainRoot, "Ocean", "box", new Vector2(data.width, data.height) * tile * .5f,
-                new Vector2(data.width, data.height) * tile, new Color32(21, 64, 79, 255), -20);
-            for (int id = 0; id < data.cells.Length; id++)
-            {
-                MazeCell cell = data.cells[id]; //현재 지형
-                Vector2 center = data.center(id); //지형 중심
-                if (cell.kind == TerrainKind.Wall)
-                {
-                    art.shape(terrainRoot, "Rock", "round", center, Vector2.one * (tile + .07f), new Color32(11, 37, 50, 255), 1);
-                    if (id % 4 == 0)
-                        art.shape(terrainRoot, "Rock glint", "round", center + new Vector2(-.25f, .43f), new Vector2(.8f, .06f), new Color32(35, 67, 76, 255), 2);
-                }
-                else
-                {
-                    if (id % 3 == 0) art.shape(terrainRoot, "Water ripple", "round", center + new Vector2(.3f, -.5f), new Vector2(.42f, .035f), new Color32(55, 111, 123, 135), -5);
-                    if (cell.kind == TerrainKind.Grass) drawGrass(id);
-                    if (cell.kind == TerrainKind.Gap) drawGap(id);
-                    if (cell.kind == TerrainKind.Net) drawNet(id);
-                }
-            }
-            art.shape(terrainRoot, "Safe start ring", "ring", data.center(data.start), Vector2.one * 1.7f, new Color( .45f, .82f, .73f, .35f), 2);
-            drawSafeRoom(data.start, "시작 · 안전구역");
-            drawSafeRoom(data.exit, "도착 · 안전구역");
-            art.shape(terrainRoot, "Exit halo", "circle", data.center(data.exit), Vector2.one * 1.9f, new Color(.45f, .95f, .8f, .18f), 3);
-            art.shape(terrainRoot, "Exit ring", "ring", data.center(data.exit), Vector2.one * 1.5f, SwimArt.mint, 4);
-            art.label(terrainRoot, "출구", data.center(data.exit), .42f, Color.white);
-        }
-
-        private void drawSafeRoom(int id, string title) //안전구역의 실제 경계와 안내 표시
-        {
-            Vector2 center = data.center(id); //안전방 중심
-            float size = data.tileSize * 3f; //안전방의 한 변 길이
-            art.shape(terrainRoot, "Safe water", "box", center, Vector2.one * size, new Color(.35f, .85f, .72f, .12f), -4);
-            for (int side = -1; side <= 1; side += 2)
-            {
-                art.shape(terrainRoot, "Safe boundary", "box", center + Vector2.right * side * size * .5f, new Vector2(.035f, size), SwimArt.mint, 2);
-                art.shape(terrainRoot, "Safe boundary", "box", center + Vector2.up * side * size * .5f, new Vector2(size, .035f), SwimArt.mint, 2);
-            }
-            art.label(terrainRoot, title, center + Vector2.down * 1.5f, .28f, SwimArt.mint);
-        }
-
-        private void drawGrass(int id) //몸을 숨길 수 있는 수풀 표시
-        {
-            Vector2 center = data.center(id); //수풀 중심
-            art.shape(terrainRoot, "Grass bed", "circle", center, Vector2.one * 1.95f, new Color32(54, 128, 109, 95), 2);
-            for (int i = 0; i < 7; i++)
-            {
-                float x = (i - 3) * .23f; //해초 가로 위치
-                var blade = art.shape(terrainRoot, "Seagrass", "round", center + new Vector2(x, -.2f + (i % 2) * .2f), new Vector2(.12f, .9f + (i % 3) * .22f), new Color32(91, 177, 141, 200), 11); //해초 잎
-                blade.transform.localRotation = Quaternion.Euler(0, 0, (i - 3) * -6f);
-            }
-        }
-
-        private void drawGap(int id) //작은 몸체만 통과하는 바위 틈 표시
-        {
-            Vector2 center = data.center(id); //틈새 중심
-            float ledge = (data.tileSize - gapWidth) * .5f; //양쪽 바위 너비
-            for (int side = -1; side <= 1; side += 2)
-            {
-                Vector2 offset = data.cells[id].horizontal ? Vector2.up : Vector2.right; //통로에 수직인 축
-                Vector2 size = data.cells[id].horizontal ? new Vector2(data.tileSize, ledge) : new Vector2(ledge, data.tileSize); //바위 크기
-                art.shape(terrainRoot, "Gap rock", "round", center + offset * side * (gapWidth + ledge) * .5f, size, new Color32(57, 89, 99, 255), 5);
-            }
-            art.label(terrainRoot, "꾹", center, .22f, SwimArt.yellow);
-        }
-
-        private void drawNet(int id) //시야가 통과하는 그물 표시
-        {
-            var root = new GameObject("Net").transform; //그물 표시 루트
-            root.SetParent(terrainRoot, false);
-            root.position = data.center(id);
-            if (data.cells[id].horizontal) root.localRotation = Quaternion.Euler(0, 0, 90f);
-            for (int i = -4; i <= 4; i++)
-            {
-                art.shape(root, "Rope", "box", new Vector2(i * .24f, 0), new Vector2(.026f, .34f), new Color32(235, 198, 143, 255), 5);
-            }
-            art.shape(root, "Cross rope", "box", new Vector2(0, .16f), new Vector2(data.tileSize, .035f), SwimArt.yellow, 5);
-            art.shape(root, "Cross rope", "box", new Vector2(0, -.16f), new Vector2(data.tileSize, .035f), SwimArt.yellow, 5);
-            nets[id] = root;
         }
 
         public Vector2 move(Vector2 position, Vector2 delta, float radius, bool predator, bool squeeze) //작은 단계로 나눈 충돌 이동
@@ -213,7 +128,7 @@ namespace TeumsaeSwim
         public bool isHidden(Vector2 position, float radius) //풀의 원형 영역 안에 완전히 들어왔는지 검사
         {
             int id = data.cellAt(position); //현재 칸
-            return id >= 0 && data.cells[id].kind == TerrainKind.Grass && Vector2.Distance(position, data.center(id)) + radius <= .97f;
+            return id >= 0 && data.cells[id].kind == TerrainKind.Grass && Vector2.Distance(position, data.center(id)) + radius <= hidingRadius;
         }
 
         public bool overlapsGap(Vector2 position, float radius) //몸체가 틈새 칸에 걸쳐 있는지 검사
@@ -263,10 +178,8 @@ namespace TeumsaeSwim
         {
             if (id < 0 || data.cells[id].kind != TerrainKind.Net || data.cells[id].netOpen) return false;
             data.cells[id].netProgress = Mathf.Min(netWorkTime, data.cells[id].netProgress + deltaTime);
-            if (nets.TryGetValue(id, out Transform visual)) visual.localScale = new Vector3(1f, Mathf.Lerp(1f, .25f, data.cells[id].netProgress / netWorkTime), 1f);
             if (data.cells[id].netProgress < netWorkTime) return false;
             data.cells[id].netOpen = true;
-            if (visual != null) visual.gameObject.SetActive(false);
             return true;
         }
 
@@ -275,11 +188,6 @@ namespace TeumsaeSwim
             return id < 0 ? 0f : Mathf.Clamp01(data.cells[id].netProgress / Mathf.Max(.01f, netWorkTime));
         }
 
-        private void removeGenerated(GameObject item) //실행 중과 편집기 검증에서 생성된 표시만 정리
-        {
-            if (Application.isPlaying) Destroy(item);
-            else DestroyImmediate(item);
-        }
 
     }
 }

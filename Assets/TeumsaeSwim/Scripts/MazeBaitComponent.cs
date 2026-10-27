@@ -8,6 +8,7 @@ namespace TeumsaeSwim
         [SerializeField] private SwimArt art; //미끼 표시 자원
         [SerializeField, Min(.1f)] private float launchSpeed = 8f; //미끼 발사 속도
         [SerializeField, Min(.1f)] private float launchDistance = 6.6f; //벽이 없을 때의 발사 거리
+        [SerializeField, Min(.1f)] private float minimumLaunchDistance = 1.1f; //짧게 드래그했을 때의 최소 발사 거리
         [SerializeField, Min(.05f)] private float bounceDistance = 1.1f; //벽 반사 후 이동 거리
         [SerializeField, Min(.1f)] private float attractDistance = 8.8f; //정지한 미끼의 유인 반경
         [SerializeField, Min(.1f)] private float baitDuration = 8f; //정지 후 미끼 유지 시간
@@ -30,18 +31,35 @@ namespace TeumsaeSwim
             baitRoot.SetParent(transform, false);
         }
 
-        public bool launch(Vector2 position, Vector2 direction) //플레이어 위치에서 바라보는 방향으로 발사
+        public bool launch(Vector2 position, Vector2 direction, float strength = 1f) //플레이어가 정한 방향과 거리로 발사
         {
             if (!maze.canOccupyProjectile(position, bodyRadius)) return false;
             if (direction.sqrMagnitude < .001f) direction = Vector2.up;
             SpriteRenderer visual = art.shape(baitRoot, "Bait", "circle", position, Vector2.one * .3f, SwimArt.yellow, 8); //날아가는 미끼 표시
-            BaitData bait = new BaitData //비행과 유인에 필요한 상태
+            BaitData bait = createFlight(position, direction, strength); //실제 비행과 예측에서 공유하는 초기 상태
+            bait.visual = visual.transform;
+            activeBaits.Add(bait);
+            return true;
+        }
+
+        private BaitData createFlight(Vector2 position, Vector2 direction, float strength) //동일한 속도와 발사 거리로 비행 상태 구성
+        {
+            return new BaitData
             {
                 position = position, velocity = direction.normalized * launchSpeed,
-                travelRemaining = launchDistance, attractDistance = attractDistance,
-                remaining = baitDuration, visual = visual.transform
+                travelRemaining = Mathf.Lerp(Mathf.Min(minimumLaunchDistance, launchDistance), launchDistance, Mathf.Clamp01(strength)),
+                attractDistance = attractDistance, remaining = baitDuration
             };
-            activeBaits.Add(bait);
+        }
+
+        public bool predict(Vector2 position, Vector2 direction, float strength, List<Vector2> path) //미끼를 소비하거나 생성하지 않는 반사 경로 예측
+        {
+            path.Clear();
+            if (direction.sqrMagnitude < .001f || !maze.canOccupyProjectile(position, bodyRadius)) return false;
+            BaitData prediction = createFlight(position, direction, strength); //활성 미끼 목록에 넣지 않는 예측 상태
+            path.Add(position);
+            advanceFlight(prediction, prediction.travelRemaining + bounceDistance + .1f, path);
+            path.Add(prediction.position);
             return true;
         }
 
@@ -64,9 +82,14 @@ namespace TeumsaeSwim
         private void fly(BaitData bait, float deltaTime) //충돌면에 한 번 반사한 뒤 짧게 이동하여 정지
         {
             float distance = Mathf.Min(bait.travelRemaining, bait.velocity.magnitude * deltaTime); //이번 갱신에서 이동할 거리
+            advanceFlight(bait, distance, null);
+        }
+
+        private void advanceFlight(BaitData bait, float distance, List<Vector2> path) //실제 비행과 조준선에서 공유하는 충돌 및 반사 이동
+        {
             while (distance > .0001f && !bait.settled)
             {
-                float step = Mathf.Min(.06f, distance); //얇은 그물을 넘지 않는 이동 단위
+                float step = Mathf.Min(.06f, Mathf.Min(distance, bait.travelRemaining)); //남은 발사 거리를 넘지 않는 충돌 검사 단위
                 Vector2 next = maze.moveProjectile(bait.position, bait.velocity.normalized * step, bodyRadius, out Vector2 normal); //충돌을 적용한 위치
                 float travelled = Vector2.Distance(bait.position, next); //실제 이동한 거리
                 bait.position = next;
@@ -74,6 +97,7 @@ namespace TeumsaeSwim
                 distance -= step;
                 if (normal.sqrMagnitude > .01f)
                 {
+                    if (path != null) path.Add(bait.position);
                     if (bait.bounceCount > 0) { settle(bait); break; }
                     bait.bounceCount++;
                     bait.velocity = Vector2.Reflect(bait.velocity, normal);
@@ -88,7 +112,7 @@ namespace TeumsaeSwim
         {
             bait.settled = true;
             bait.velocity = Vector2.zero;
-            art.shape(bait.visual, "Bait ripple", "ring", Vector2.zero, Vector2.one * 3.4f, new Color(1f, .82f, .4f, .45f), 7);
+            if (bait.visual != null) art.shape(bait.visual, "Bait ripple", "ring", Vector2.zero, Vector2.one * 3.4f, new Color(1f, .82f, .4f, .45f), 7);
         }
 
         public void consume(BaitData bait) //먹었거나 만료된 미끼 제거

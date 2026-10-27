@@ -50,9 +50,7 @@ namespace TeumsaeSwim.Editor
                 {
                     Predator predator = predators[i]; //종류별 그림을 확대해 확인할 대상
                     predator.transform.position = new Vector2(i % 2 == 0 ? -1.55f : 1.55f, i < 2 ? 2f : -1.5f);
-                    PredatorTypeProfile profile = game.predatorTypes[(int)predator.kind]; //실제 그림과 시야 설정
-                    predator.GetComponent<PredatorVisualComponent>().tick(maze, Vector2.right, PredatorState.Patrol, 0, profile.range, 86, 0);
-                    predator.transform.Find("Field of view").GetComponent<MeshRenderer>().enabled = false;
+                    predator.GetComponent<PredatorVisualComponent>().tick(Vector2.right, PredatorState.Patrol, 0);
                 }
                 camera.transform.position = new Vector3(0, 0, -10);
                 camera.orthographicSize = 5.1f;

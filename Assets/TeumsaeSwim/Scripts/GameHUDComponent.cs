@@ -5,6 +5,8 @@ namespace TeumsaeSwim
 {
     public sealed class GameHUDComponent : MonoBehaviour
     {
+        [SerializeField, Min(20f)] private float baitFullDragDistance = 90f; //미끼 최대 거리까지 드래그할 UI 길이
+        [SerializeField, Min(0f)] private float baitCancelRadius = 12f; //미끼 조준을 취소하는 버튼 중앙 반경
         private SwimGame game; //플레이 정보 진입점
         private Player player; //입력과 상호작용 진입점
         private GameUIStyleComponent style; //공통 화면 디자인
@@ -26,6 +28,7 @@ namespace TeumsaeSwim
         private RectTransform netCallout; //플레이어 근처 그물 안내
         private TouchControlComponent stick; //스틱 입력
         private TouchControlComponent hold; //누름 입력
+        private TouchBaitAimComponent baitAim; //미끼 드래그 조준 입력
         private float messageTime; //임시 알림 남은 시간
         private string temporaryMessage = ""; //임시 알림
         public string cargoText => cargoLabel.text; //검증과 접근성에 제공하는 실제 진주 안내
@@ -95,13 +98,16 @@ namespace TeumsaeSwim
             stick.initialize(player, knob.rectTransform, false);
             style.text(bottom, "이동", new Vector2(-141, 15), new Vector2(100, 26), 14, SwimArt.mint, TextAnchor.MiddleCenter, true);
 
-            baitButton = style.button(bottom, "", new Vector2(18, 85), new Vector2(78, 78), () => player.useBait());
+            baitButton = style.button(bottom, "", new Vector2(18, 85), new Vector2(78, 78), () => { });
             RectTransform baitRoot = baitButton.GetComponent<RectTransform>(); //미끼 그림과 개수
             style.icon(baitRoot, SwimUIIcon.Bait, new Vector2(0, 16), 37, new Color32(255, 151, 64, 255));
             style.text(baitRoot, "미끼", new Vector2(0, -15), new Vector2(64, 24), 15, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
             RectTransform badge = style.card(baitRoot, "Bait count", new Vector2(29, 36), Vector2.one * 29, SwimArt.ink, GameUIStyleComponent.muted).rectTransform; //잔여 개수 배지
             baitLabel = style.text(badge, "2", Vector2.zero, Vector2.one * 28, 17, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
-            style.text(bottom, "시선 방향 발사", new Vector2(18, 15), new Vector2(120, 26), 11, GameUIStyleComponent.muted);
+            RectTransform aimHandle = style.picture(baitRoot, "Aim handle", "circle", Vector2.zero, Vector2.one * 15, SwimArt.mint).rectTransform; //드래그 방향을 보여주는 표시
+            baitAim = baitRoot.gameObject.AddComponent<TouchBaitAimComponent>();
+            baitAim.initialize(player, aimHandle, baitFullDragDistance, baitCancelRadius);
+            style.text(bottom, "드래그 조준 · 놓기", new Vector2(18, 15), new Vector2(120, 26), 11, GameUIStyleComponent.muted);
 
             Image holdBase = style.picture(bottom, "Hold action", "circle", new Vector2(151, 88), Vector2.one * 125, GameUIStyleComponent.panel); //꾹 터치 영역
             holdBase.raycastTarget = true;
@@ -125,6 +131,7 @@ namespace TeumsaeSwim
         {
             stick.resetControl();
             hold.resetControl();
+            baitAim.resetControl();
             panel.SetActive(game.phase == SwimPhase.Playing);
             if (game.phase == SwimPhase.Playing) { messageTime = 0; temporaryMessage = ""; }
         }
@@ -147,7 +154,8 @@ namespace TeumsaeSwim
             statusLabel.color = player.safe || player.hidden ? SwimArt.mint : string.IsNullOrEmpty(game.danger) ? GameUIStyleComponent.cream : SwimArt.coral;
             if (!string.IsNullOrEmpty(player.message)) { temporaryMessage = player.message; messageTime = 3; }
             messageTime -= deltaTime;
-            hintLabel.text = messageTime > 0 ? temporaryMessage : player.nearNet ? "이동하면서 꾹 눌러도 그물이 풀려요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : player.hasCargo ? "진주를 챙겼어요! 출구까지 가져가요" : "미끼로 유인하고, 풀숲에 숨어 보세요";
+            hintLabel.text = player.baitAiming ? player.baitAimStrength > 0 ? "조준 " + Mathf.RoundToInt(player.baitAimStrength * 100) + "% · 놓으면 발사 / 중앙으로 취소" : "드래그로 방향·거리 조절 · 중앙에서 놓으면 취소" :
+                messageTime > 0 ? temporaryMessage : player.nearNet ? "이동하면서 꾹 눌러도 그물이 풀려요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : player.hasCargo ? "진주를 챙겼어요! 출구까지 가져가요" : "미끼 버튼을 드래그해 조준하고, 풀숲에 숨어요";
             holdCaption.text = player.nearNet ? "그물 풀기" : player.squeezed ? "틈 통과 중" : "틈 통과 · 그물 풀기";
             holdFace.color = player.working ? new Color32(255, 238, 164, 255) : SwimArt.yellow;
             netRing.fillAmount = player.nearNet ? player.netProgress : 0;

@@ -18,7 +18,7 @@ namespace TeumsaeSwim
 
         public Sprite sprite(string kind) //코드로 만든 도형 이미지 재사용
         {
-            if (sprites.TryGetValue(kind, out Sprite cached)) return cached;
+            if (sprites.TryGetValue(kind, out Sprite cached) && cached != null && cached.texture != null) return cached;
             int size = kind.StartsWith("ui-") ? 256 : 96; //큰 UI 원형은 충분한 해상도로 생성
             string geometry = kind.StartsWith("ui-") ? kind.Substring(3) : kind; //UI와 월드에서 공유할 도형 종류
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false); //투명 도형 텍스처

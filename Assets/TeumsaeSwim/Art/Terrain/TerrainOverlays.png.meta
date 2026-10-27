@@ -1,0 +1,425 @@
+fileFormatVersion: 2
+guid: 567ea87931beae947897f877e31cfd13
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4773823801170168277
+    second: TerrainOverlays_0
+  - first:
+      213: 4183576442000808421
+    second: TerrainOverlays_1
+  - first:
+      213: -306308284626878747
+    second: TerrainOverlays_2
+  - first:
+      213: 3501135568451260289
+    second: TerrainOverlays_3
+  - first:
+      213: 4176028302389740529
+    second: TerrainOverlays_4
+  - first:
+      213: 2592514855551211304
+    second: TerrainOverlays_5
+  - first:
+      213: 4639338217270111283
+    second: TerrainOverlays_6
+  - first:
+      213: 5129713565830891227
+    second: TerrainOverlays_7
+  - first:
+      213: 2597357691102162403
+    second: TerrainOverlays_8
+  - first:
+      213: 5348359103065214127
+    second: TerrainOverlays_9
+  - first:
+      213: 7863647957223153929
+    second: TerrainOverlays_10
+  - first:
+      213: -2740265167425862882
+    second: TerrainOverlays_11
+  - first:
+      213: 1923639576054623959
+    second: TerrainOverlays_12
+  - first:
+      213: 6846935469655892250
+    second: TerrainOverlays_13
+  - first:
+      213: -7512295619756395907
+    second: TerrainOverlays_14
+  - first:
+      213: 2459805227860617498
+    second: TerrainOverlays_15
+  - first:
+      213: 3489000082089658591
+    second: TerrainOverlays_16
+  - first:
+      213: -5195200498716805235
+    second: TerrainOverlays_17
+  - first:
+      213: -2492003828496620307
+    second: TerrainOverlays_18
+  - first:
+      213: -1755226600111807642
+    second: TerrainOverlays_19
+  - first:
+      213: 5248719013098339687
+    second: TerrainOverlays_20
+  - first:
+      213: -5310208415983856542
+    second: TerrainOverlays_21
+  - first:
+      213: -1159081365200022850
+    second: TerrainOverlays_22
+  - first:
+      213: 2335075155770175477
+    second: TerrainOverlays_23
+  - first:
+      213: 27086588370172623
+    second: TerrainOverlays_24
+  - first:
+      213: -41716117505751338
+    second: TerrainOverlays_25
+  - first:
+      213: -436915400767288579
+    second: TerrainOverlays_26
+  - first:
+      213: -6329562032439535832
+    second: TerrainOverlays_27
+  - first:
+      213: -6359925590509120668
+    second: TerrainOverlays_28
+  - first:
+      213: 4434456108358957159
+    second: TerrainOverlays_29
+  - first:
+      213: -3813347445977922060
+    second: TerrainOverlays_30
+  - first:
+      213: -6762348789327781209
+    second: TerrainOverlays_31
+  - first:
+      213: 8821559196772914884
+    second: TerrainOverlays_32
+  - first:
+      213: 6337305862663067370
+    second: TerrainOverlays_33
+  - first:
+      213: 7551872944258865842
+    second: TerrainOverlays_34
+  - first:
+      213: -8102612233484739500
+    second: TerrainOverlays_35
+  - first:
+      213: -475709329742063163
+    second: TerrainOverlays_36
+  - first:
+      213: -1977807425771059809
+    second: TerrainOverlays_37
+  - first:
+      213: 2299466903351891441
+    second: TerrainOverlays_38
+  - first:
+      213: -5942279486211874827
+    second: TerrainOverlays_39
+  - first:
+      213: 4436349831935401517
+    second: TerrainOverlays_40
+  - first:
+      213: 9181408991852073253
+    second: TerrainOverlays_41
+  - first:
+      213: -51100244988446628
+    second: TerrainOverlays_42
+  - first:
+      213: 4782773531581540068
+    second: TerrainOverlays_43
+  - first:
+      213: 2020204931050250426
+    second: TerrainOverlays_44
+  - first:
+      213: -8688405325683505926
+    second: TerrainOverlays_45
+  - first:
+      213: -5219006694462224883
+    second: TerrainOverlays_46
+  - first:
+      213: -4148041808005302535
+    second: TerrainOverlays_47
+  - first:
+      213: -8068043772867059591
+    second: TerrainOverlays_48
+  - first:
+      213: 5978210497857513813
+    second: TerrainOverlays_49
+  - first:
+      213: -6195626009036153254
+    second: TerrainOverlays_50
+  - first:
+      213: -4077578918886594865
+    second: TerrainOverlays_51
+  - first:
+      213: 1704658965714369003
+    second: TerrainOverlays_52
+  - first:
+      213: -1077041104591880655
+    second: TerrainOverlays_53
+  - first:
+      213: -3846802162899330098
+    second: TerrainOverlays_54
+  - first:
+      213: 8776246658145994544
+    second: TerrainOverlays_55
+  - first:
+      213: 5471263676834680569
+    second: TerrainOverlays_56
+  - first:
+      213: -4233934861561209675
+    second: TerrainOverlays_57
+  - first:
+      213: -7826561430185611873
+    second: TerrainOverlays_58
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 256
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: grass
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 546
+        width: 620
+        height: 637
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 321a9747d9b186943b6b811310a90269
+      internalID: 1995063212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coral
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 567
+        width: 486
+        height: 464
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e156f03aafe471e42950de91de906052
+      internalID: -466187861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: closedNet
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 107
+        width: 589
+        height: 324
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c33d6e5b60b084848b5b98d878860797
+      internalID: 1166175349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: openNet
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 102
+        width: 599
+        height: 329
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 038945c956be1604a8a8af9163fd671a
+      internalID: -434027543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5994f52fe38b9b24eb1b9bd6f32fa4aa
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      closedNet: 1166175349
+      coral: -466187861
+      grass: 1995063212
+      openNet: -434027543
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

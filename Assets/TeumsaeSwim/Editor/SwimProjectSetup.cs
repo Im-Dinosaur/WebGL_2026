@@ -48,7 +48,6 @@ namespace TeumsaeSwim.Editor
             link(maze, "terrain", mazeObject.GetComponent<MazeTerrainComponent>());
             link(maze, "bait", mazeObject.GetComponent<MazeBaitComponent>());
             link(maze, "items", mazeObject.GetComponent<MazeItemComponent>());
-            link(mazeObject.GetComponent<MazeTerrainComponent>(), "art", art);
             link(mazeObject.GetComponent<MazeBaitComponent>(), "art", art);
             link(mazeObject.GetComponent<MazeItemComponent>(), "art", art);
 
@@ -87,6 +86,7 @@ namespace TeumsaeSwim.Editor
             AssetDatabase.SaveAssets();
             if (File.Exists(PredatorTypeSetup.atlasPath)) PredatorTypeSetup.connect();
             if (File.Exists("Assets/TeumsaeSwim/Art/UI/OceanHome.png")) SwimUISetup.connect();
+            if (File.Exists(MazeTileSetup.surfacePath)) MazeTileSetup.connect();
             Debug.Log("TEUMSAE_SETUP_OK: " + scenePath);
         }
 

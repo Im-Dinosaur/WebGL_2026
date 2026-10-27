@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace TeumsaeSwim.Editor
@@ -10,6 +11,23 @@ namespace TeumsaeSwim.Editor
     public static class PredatorTypeVerification
     {
         private static int assertions; //종류별 검증 통과 수
+
+        public static void verifyHiddenSight() //시야를 숨긴 네 종류의 행동과 화면을 실제 씬에서 검증
+        {
+            EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
+            try
+            {
+                Maze maze = UnityEngine.Object.FindFirstObjectByType<Maze>(); //실제 미로
+                Player player = UnityEngine.Object.FindFirstObjectByType<Player>(); //실제 플레이어
+                SwimGame game = UnityEngine.Object.FindFirstObjectByType<SwimGame>(); //실제 게임 파사드
+                typeof(Player).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(player, null);
+                typeof(SwimGame).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+                int count = run(maze, player, game); //종류별 탐지와 상태 표시 검사 수
+                Debug.Log("SUMBAKKOGI_HIDDEN_SIGHT_OK: " + count + " assertions");
+            }
+            finally { EditorSceneManager.OpenScene(SwimProjectSetup.scenePath); }
+            PredatorTypePreview.capture();
+        }
 
         public static int run(Maze maze, Player player, SwimGame game) //실제 자원과 파사드를 사용하는 포식자 종류 회귀 검사
         {
@@ -74,7 +92,7 @@ namespace TeumsaeSwim.Editor
                 predator.initialize(maze, player, home, SwimDifficulty.Normal, 67, profile);
                 PredatorAIComponent ai = predator.GetComponent<PredatorAIComponent>(); //종류가 적용된 AI
                 PredatorMovementComponent mover = predator.GetComponent<PredatorMovementComponent>(); //종류가 적용된 이동
-                PredatorVisualComponent visual = predator.GetComponent<PredatorVisualComponent>(); //시야와 물고기 표시
+                PredatorVisualComponent visual = predator.GetComponent<PredatorVisualComponent>(); //물고기와 발견 신호 표시
                 require(predator.kind == profile.type && Mathf.Approximately(ai.range, profile.range), "Facade applies type " + profile.type);
                 float[] ranges = { 3.5f, 5.6f, 2.8f, 3.5f }; //승인한 초기 시야 거리
                 float[] notices = { .9f, 1.1f, .45f, 1.2f }; //승인한 초기 발견 시간
@@ -129,12 +147,22 @@ namespace TeumsaeSwim.Editor
                 require(predator.GetComponentsInChildren<SpriteRenderer>().Any(renderer => renderer.sprite == profile.sprite), "Profile artwork rendered");
                 Transform body = predator.transform.Find("Predator body"); //회전과 헤엄을 적용한 몸체
                 Vector3 pose = body.localScale; //일시정지 전 자세
-                visual.tick(maze, mover.facing, predator.state, ai.noticeFraction, ai.range, ai.angle, 0);
+                visual.tick(mover.facing, predator.state, ai.noticeFraction, 0);
                 require(body.localScale == pose, "Paused sprite animation does not advance");
-                visual.tick(maze, Vector2.left, PredatorState.Patrol, 0, ai.range, ai.angle, 0);
+                visual.tick(Vector2.left, PredatorState.Patrol, 0);
                 require(body.localScale.y < 0 && Vector3.Dot(body.TransformVector(Vector3.up), Vector3.up) > 0, "Left-facing sprite stays upright");
-                Mesh mesh = predator.GetComponentInChildren<MeshFilter>().sharedMesh; //실제 시야 표시 메시
-                require(mesh.vertices.Skip(1).All(vertex => vertex.magnitude <= profile.range + .01f), "Vision display obeys range");
+                require(predator.GetComponentsInChildren<MeshFilter>(true).Length == 0 && predator.transform.Find("Field of view") == null,
+                    "No visible or hidden sight cone is created");
+                TextMesh marker = predator.transform.Find("Label ").GetComponent<TextMesh>(); //플레이어가 볼 발견 신호
+                Transform gauge = predator.transform.Find("Notice gauge"); //발견 진행 게이지
+                visual.tick(Vector2.right, PredatorState.Notice, .5f);
+                require(marker.text == "?" && gauge.gameObject.activeSelf && Mathf.Approximately(gauge.localScale.x, .4f), "Notice keeps question mark and progress gauge");
+                visual.tick(Vector2.right, PredatorState.Chase, 1);
+                require(marker.text == "!" && !gauge.gameObject.activeSelf, "Chase keeps exclamation mark");
+                visual.tick(Vector2.right, PredatorState.Lure, 0);
+                require(marker.text == "?" && !gauge.gameObject.activeSelf, "Bait lure keeps question mark");
+                visual.tick(Vector2.right, PredatorState.Patrol, 0);
+                require(marker.text == "" && !gauge.gameObject.activeSelf, "Patrol hides alert indicators");
             }
             finally { UnityEngine.Object.DestroyImmediate(predator.gameObject); }
         }

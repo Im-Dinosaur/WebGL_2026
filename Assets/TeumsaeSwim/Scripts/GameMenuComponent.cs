@@ -139,7 +139,7 @@ namespace TeumsaeSwim
             string[] bodies = {
                 "스틱으로 움직여 빛나는 출구를 찾아요.\n시작·도착의 민트색 구역에서는 안전해요.",
                 "좁은 틈에서는 꾹 누른 채 이동해요.\n그물도 움직이며 꾹 2초! 진행도는 유지돼요.",
-                "풀숲에 완전히 숨으면 닿아도 잡히지 않아요.\n미끼는 바라보는 쪽으로 나가 포식자를 유인해요.",
+                "풀숲에 완전히 숨으면 닿아도 잡히지 않아요.\n미끼 버튼을 드래그해 조준! 놓으면 발사해요.",
                 "탈출 + 시간 내 도착 + 진주 운반 = 별 3개!\n시간이 지나도 계속할 수 있어요. 잡히면 별 0개."
             }; //조작과 점수 규칙
             for (int i = 0; i < 4; i++)
@@ -156,7 +156,7 @@ namespace TeumsaeSwim
                 style.text(card, profile.title, new Vector2(46, 21), new Vector2(270, 30), 19, profile.color, TextAnchor.MiddleLeft, true);
                 style.text(card, profile.hint, new Vector2(46, -16), new Vector2(270, 49), 14, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
             }
-            style.text(root, "PC  WASD / 방향키 이동 · SPACE 꾹 · E 미끼 · ESC 멈춤", new Vector2(0, -275), new Vector2(442, 37), 12, GameUIStyleComponent.muted);
+            style.text(root, "PC  WASD 이동 · SPACE 꾹 · 마우스 드래그 조준\nE 시선 방향 빠른 발사 · ESC 멈춤", new Vector2(0, -275), new Vector2(442, 44), 12, GameUIStyleComponent.muted);
             style.button(root, "알겠어, 헤엄칠 준비 됐어", new Vector2(0, -350), new Vector2(390, 57), () => helpPanel.SetActive(false), true, 20);
             showHelpPage(false);
             helpPanel.SetActive(false);

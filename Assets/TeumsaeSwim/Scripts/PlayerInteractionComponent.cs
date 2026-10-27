@@ -28,7 +28,8 @@ namespace TeumsaeSwim
             message = "";
         }
 
-        public void tick(Vector2 position, Vector2 input, Vector2 facing, bool hold, bool bait, float deltaTime) //그물 작업과 미끼 배치 처리
+        public void tick(Vector2 position, Vector2 input, Vector2 facing, bool hold, bool bait, float deltaTime,
+            Vector2 baitDirection = default, float baitStrength = 1f) //그물 작업과 선택한 방향의 미끼 발사 처리
         {
             message = "";
             netTarget = maze.nearbyNet(position);
@@ -46,8 +47,8 @@ namespace TeumsaeSwim
             previousWorking = working;
             if (!bait) return;
             if (baitCount <= 0) { message = "남은 미끼가 없어"; return; }
-            Vector2 direction = input.sqrMagnitude > .04f ? input.normalized : facing; //현재 입력을 우선한 발사 방향
-            if (!maze.placeBait(position, direction)) { message = "여기서는 미끼를 발사할 수 없어"; return; }
+            Vector2 direction = baitDirection.sqrMagnitude > .04f ? baitDirection.normalized : input.sqrMagnitude > .04f ? input.normalized : facing; //조준을 우선하고 빠른 발사에는 이동과 시선 적용
+            if (!maze.placeBait(position, direction, baitStrength)) { message = "여기서는 미끼를 발사할 수 없어"; return; }
             baitCount--;
             message = "미끼 발사! 멈추면 주변 포식자를 유인해요";
             cue?.Invoke(SwimCue.Bait);

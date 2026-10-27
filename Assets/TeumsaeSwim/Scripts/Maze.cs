@@ -7,6 +7,7 @@ namespace TeumsaeSwim
     {
         [SerializeField] private MazeGenerationComponent generation; //미로 생성 구성 요소
         [SerializeField] private MazeTerrainComponent terrain; //지형 처리 구성 요소
+        [SerializeField] private MazeTileVisualComponent visual; //타일 지형 표시 구성 요소
         [SerializeField] private MazeBaitComponent bait; //미끼 발사와 수명 구성 요소
         [SerializeField] private MazeItemComponent items; //진주 배치와 획득 구성 요소
         public MazeData data { get; private set; } //현재 미로
@@ -16,6 +17,7 @@ namespace TeumsaeSwim
         {
             data = generation.generate(seed, difficulty);
             terrain.initialize(data);
+            visual.initialize(data, terrain.gapSize, terrain.hidingRadius);
             bait.initialize(this);
             items.initialize(this);
         }
@@ -89,12 +91,19 @@ namespace TeumsaeSwim
 
         public bool workNet(int id, float deltaTime) //그물의 누적 작업과 개방
         {
-            return terrain.workNet(id, deltaTime);
+            bool opened = terrain.workNet(id, deltaTime); //이번 작업으로 그물이 열렸는지 여부
+            if (id >= 0 && id < data.cells.Length) visual.refreshNet(id, terrain.netProgress(id));
+            return opened;
         }
 
-        public bool placeBait(Vector2 position, Vector2 facing) //유효한 위치에 미끼 배치
+        public bool placeBait(Vector2 position, Vector2 direction, float strength = 1f) //선택한 방향과 거리로 미끼 발사
         {
-            return bait.launch(position, facing);
+            return bait.launch(position, direction, strength);
+        }
+
+        public bool predictBait(Vector2 position, Vector2 direction, float strength, List<Vector2> path) //실제 비행과 같은 충돌 규칙의 예상 경로 제공
+        {
+            return bait.predict(position, direction, strength, path);
         }
 
         public void consumeBait(BaitData bait) //도착한 포식자의 미끼 소모

@@ -20,7 +20,7 @@
 </head>
 <body>
   <main aria-label="숨바꼬기 웹 게임">
-    <canvas id="unity-canvas" width="480" height="854" tabindex="0" aria-label="숨바꼬기 게임 화면. 방향키로 이동, 스페이스로 틈 통과와 그물 작업, E로 미끼 사용, ESC로 일시정지."></canvas>
+    <canvas id="unity-canvas" width="480" height="854" tabindex="0" aria-label="숨바꼬기 게임 화면. 방향키로 이동, 스페이스로 틈 통과와 그물 작업. 미끼 버튼을 드래그해 방향과 거리를 조준하고 놓으면 발사, 버튼 중앙에서 놓으면 취소. E로 빠른 발사, ESC로 일시정지."></canvas>
     <div id="loading" role="status" aria-live="polite">
       <div class="fish" aria-hidden="true">◁●</div><h1>숨바꼬기</h1>
       <div class="track"><div class="fill" id="progress"></div></div>
@@ -39,12 +39,12 @@
       document.getElementById('retry').hidden=false;
     }
     const config = {
-      dataUrl: 'Build/teumsae-swim.data.unityweb?v=62699bad3513', frameworkUrl: 'Build/teumsae-swim.framework.js.unityweb?v=62699bad3513', codeUrl: 'Build/teumsae-swim.wasm.unityweb?v=62699bad3513',
+      dataUrl: 'Build/teumsae-swim.data.unityweb?v=b8187b80047f', frameworkUrl: 'Build/teumsae-swim.framework.js.unityweb?v=b8187b80047f', codeUrl: 'Build/teumsae-swim.wasm.unityweb?v=b8187b80047f',
       streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.0',
       matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
     };
-    const loader=document.createElement('script');loader.src='Build/teumsae-swim.loader.js?v=62699bad3513';
+    const loader=document.createElement('script');loader.src='Build/teumsae-swim.loader.js?v=b8187b80047f';
     loader.onerror=()=>showError('파일 다운로드 오류');
     loader.onload=()=>createUnityInstance(canvas,config,p=>{
       document.getElementById('progress').style.width=Math.round(p*100)+'%';

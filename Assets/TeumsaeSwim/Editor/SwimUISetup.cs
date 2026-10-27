@@ -26,10 +26,30 @@ namespace TeumsaeSwim.Editor
             link(ui, "hud", hud);
             link(ui, "menus", menus);
             link(Object.FindFirstObjectByType<PlayerVisualComponent>(), "fishSprite", fish);
+            connectAimToPlayer();
             EditorSceneManager.MarkSceneDirty(game.gameObject.scene);
             EditorSceneManager.SaveScene(game.gameObject.scene);
             AssetDatabase.SaveAssets();
             Debug.Log("SUMBAKKOGI_UI_CONNECTED");
+        }
+
+        [MenuItem("Teumsae Swim/9. Connect bait aiming")]
+        public static void connectAim() //기존 타일과 UI 자원을 다시 가져오지 않고 조준 구성만 연결
+        {
+            EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
+            connectAimToPlayer();
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+            AssetDatabase.SaveAssets();
+            Debug.Log("SUMBAKKOGI_BAIT_AIM_CONNECTED");
+        }
+
+        private static void connectAimToPlayer() //플레이어 진입점과 조준 그림의 Inspector 참조 연결
+        {
+            Player player = Object.FindFirstObjectByType<Player>(); //기존 플레이어
+            PlayerBaitAimComponent aim = ensure<PlayerBaitAimComponent>(player.gameObject); //조준 경로 표시 구성 요소
+            link(aim, "art", AssetDatabase.LoadAssetAtPath<SwimArt>("Assets/TeumsaeSwim/Art/SwimArt.asset"));
+            link(player, "baitAim", aim);
         }
 
         public static void connectAndVerify() //한 번의 배치 실행에서 연결과 기능 검증

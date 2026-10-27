@@ -24,6 +24,97 @@ namespace TeumsaeSwim.Editor
             captureScreens(true);
         }
 
+        public static void captureAim() //타일 맵에서 반사 조준과 실제 도착 위치 및 안내 화면 확인
+        {
+            EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
+            SwimGame game = Object.FindFirstObjectByType<SwimGame>(); //실제 게임
+            Player player = Object.FindFirstObjectByType<Player>(); //실제 플레이어
+            Camera camera = Camera.main; //게임 카메라
+            typeof(Player).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(player, null);
+            typeof(SwimGame).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+            Canvas canvas = game.GetComponentInChildren<Canvas>(); //현재 UI
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = camera;
+            canvas.planeDistance = 1;
+            try
+            {
+                game.begin(SwimDifficulty.Normal, false);
+                Canvas.ForceUpdateCanvases();
+                Maze maze = Object.FindFirstObjectByType<Maze>(); //실제 미끼 비행 대상
+                var path = new System.Collections.Generic.List<Vector2>(); //반사가 화면에 보이는 조준 방향 선택
+                Vector2 direction = Vector2.zero; //검토에 사용할 사선 반사 방향
+                foreach (float angle in new[] { 70f, 110f, 60f, 120f, 45f, 135f, -45f, -135f })
+                {
+                    Vector2 candidate = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)); //현재 후보 방향
+                    if (!maze.predictBait(player.position, candidate, 1, path) || path.Count < 3) continue;
+                    Vector2 impact = path[1] - player.position; //충돌 지점의 화면 안 상대 위치
+                    if (Mathf.Abs(impact.x) > 4.5f || Mathf.Abs(impact.y) > 5.4f) continue;
+                    if (Mathf.Abs(Vector2.Dot((path[1] - path[0]).normalized, (path[2] - path[1]).normalized)) > .95f) continue;
+                    direction = candidate;
+                    break;
+                }
+                if (direction == Vector2.zero) throw new System.InvalidOperationException("No visible oblique bounce for aim preview");
+                TouchBaitAimComponent control = game.GetComponentInChildren<TouchBaitAimComponent>(); //실제 드래그 입력 대상
+                Vector2 screenCenter = RectTransformUtility.WorldToScreenPoint(camera, control.transform.position); //버튼 화면 중심
+                var pointer = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current)
+                {
+                    pointerId = 33, position = screenCenter,
+                    pointerPressRaycast = new UnityEngine.EventSystems.RaycastResult { module = canvas.GetComponent<GraphicRaycaster>(), gameObject = control.gameObject }
+                }; //실제 카메라 좌표를 사용하는 검토 포인터
+                control.OnPointerDown(pointer);
+                pointer.position = RectTransformUtility.WorldToScreenPoint(camera, control.transform.TransformPoint(direction * 90f));
+                control.OnDrag(pointer);
+                player.tick(0);
+                save(game, camera, canvas, "bait-aim-bounce", 720, 1280);
+                save(game, camera, canvas, "bait-aim-landscape", 1280, 720);
+                player.endBaitAim(true);
+                control.resetControl();
+                player.tick(0);
+                for (int frame = 0; frame < 180 && maze.baits.Count > 0 && !maze.baits[0].settled; frame++) maze.tick(1f / 60f);
+                save(game, camera, canvas, "bait-aim-landed", 720, 1280);
+                game.GetComponent<GameMenuComponent>().openHelp();
+                save(game, camera, canvas, "bait-aim-help", 720, 1280);
+                Debug.Log("SUMBAKKOGI_BAIT_AIM_PREVIEW_OK");
+            }
+            finally { EditorSceneManager.OpenScene(SwimProjectSetup.scenePath); }
+        }
+
+        public static void captureTerrain() //새 타일의 시작 구간과 그물 및 풀숲을 실제 모바일 화면으로 확인
+        {
+            EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
+            SwimGame game = Object.FindFirstObjectByType<SwimGame>(); //실제 게임
+            Player player = Object.FindFirstObjectByType<Player>(); //실제 플레이어
+            Camera camera = Camera.main; //게임 카메라
+            typeof(Player).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(player, null);
+            typeof(SwimGame).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null);
+            Canvas canvas = game.GetComponentInChildren<Canvas>(); //실제 UI
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = camera;
+            canvas.planeDistance = 1;
+            try
+            {
+                game.begin(SwimDifficulty.Normal, false);
+                save(game, camera, canvas, "tile-start", 720, 1280);
+                Maze maze = Object.FindFirstObjectByType<Maze>(); //이번 랜덤 지형
+                int net = System.Array.FindIndex(maze.data.cells, cell => cell.kind == TerrainKind.Net); //그물 위치
+                Vector2 approach = maze.data.cells[net].horizontal ? Vector2.left : Vector2.down; //통로의 접근 방향
+                player.transform.position = maze.data.center(net) + approach * .8f;
+                save(game, camera, canvas, "tile-net-closed", 720, 1280);
+                maze.workNet(net, 5);
+                save(game, camera, canvas, "tile-net-open", 720, 1280);
+                int grass = System.Array.FindIndex(maze.data.cells, cell => cell.kind == TerrainKind.Grass); //은신 구간
+                player.transform.position = maze.data.center(grass);
+                save(game, camera, canvas, "tile-grass", 720, 1280);
+                int gap = System.Array.FindIndex(maze.data.cells, cell => cell.kind == TerrainKind.Gap); //좁은 통로
+                approach = maze.data.cells[gap].horizontal ? Vector2.left : Vector2.down;
+                player.transform.position = maze.data.center(gap) + approach * 1.4f;
+                save(game, camera, canvas, "tile-gap", 720, 1280);
+                save(game, camera, canvas, "tile-landscape", 1280, 720);
+                Debug.Log("SUMBAKKOGI_TILE_PREVIEW_OK");
+            }
+            finally { EditorSceneManager.OpenScene(SwimProjectSetup.scenePath); }
+        }
+
         private static void captureScreens(bool netOnly) //필요한 화면 상태만 생성하고 검토
         {
             EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
