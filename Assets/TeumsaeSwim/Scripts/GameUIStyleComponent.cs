@@ -133,10 +133,20 @@ namespace TeumsaeSwim
             ColorBlock colors = item.colors; //누르는 동안 색 변화
             colors.pressedColor = new Color(.73f, .88f, .86f);
             colors.highlightedColor = new Color(.93f, 1f, 1f);
+            colors.fadeDuration = .07f;
             item.colors = colors;
             item.navigation = new Navigation { mode = Navigation.Mode.None };
             text(face.rectTransform, value, Vector2.zero, size - new Vector2(20, 4), fontSize, primary ? SwimArt.ink : cream, TextAnchor.MiddleCenter, true);
+            feedback(edge.rectTransform, face.rectTransform, item);
             return item;
+        }
+
+        public UIButtonFeedbackComponent feedback(RectTransform input, RectTransform visual, Button selectable = null, bool keepOutside = false) //고정 입력 영역에 표시 전용 효과 연결
+        {
+            Image wave = picture(input, "Touch ripple", "ring", Vector2.zero, Vector2.one * Mathf.Min(input.sizeDelta.x, input.sizeDelta.y) * .6f, new Color32(192, 255, 237, 115)); //짧은 민트색 물결
+            UIButtonFeedbackComponent effect = input.gameObject.AddComponent<UIButtonFeedbackComponent>(); //UI 내부의 독립적인 반응
+            effect.initialize(visual, wave, selectable, keepOutside);
+            return effect;
         }
 
         public Button startButton(RectTransform parent, Vector2 position, Action action) //홈 전용 산호색 시작 버튼과 밝은 윗면

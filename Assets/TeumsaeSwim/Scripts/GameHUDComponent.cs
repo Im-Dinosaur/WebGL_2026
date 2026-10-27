@@ -29,6 +29,7 @@ namespace TeumsaeSwim
         private TouchControlComponent stick; //스틱 입력
         private TouchControlComponent hold; //누름 입력
         private TouchBaitAimComponent baitAim; //미끼 드래그 조준 입력
+        private UIButtonFeedbackComponent holdFeedback; //꾹 버튼의 누름 상태와 표시 효과
         private float messageTime; //임시 알림 남은 시간
         private string temporaryMessage = ""; //임시 알림
         public string cargoText => cargoLabel.text; //검증과 접근성에 제공하는 실제 진주 안내
@@ -100,6 +101,8 @@ namespace TeumsaeSwim
 
             baitButton = style.button(bottom, "", new Vector2(18, 85), new Vector2(78, 78), () => { });
             RectTransform baitRoot = baitButton.GetComponent<RectTransform>(); //미끼 그림과 개수
+            UIButtonFeedbackComponent baitFeedback = baitRoot.GetComponent<UIButtonFeedbackComponent>(); //조준 중 영역 밖에서도 누름 유지
+            baitFeedback.initialize(baitButton.targetGraphic.rectTransform, baitRoot.Find("Touch ripple").GetComponent<Image>(), baitButton, true);
             style.icon(baitRoot, SwimUIIcon.Bait, new Vector2(0, 16), 37, new Color32(255, 151, 64, 255));
             style.text(baitRoot, "미끼", new Vector2(0, -15), new Vector2(64, 24), 15, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
             RectTransform badge = style.card(baitRoot, "Bait count", new Vector2(29, 36), Vector2.one * 29, SwimArt.ink, GameUIStyleComponent.muted).rectTransform; //잔여 개수 배지
@@ -124,6 +127,7 @@ namespace TeumsaeSwim
             netRing.fillAmount = 0;
             hold = holdBase.gameObject.AddComponent<TouchControlComponent>();
             hold.initialize(player, null, true);
+            holdFeedback = style.feedback(holdBase.rectTransform, holdFace.rectTransform, null, true);
             holdCaption = style.text(bottom, "틈 통과 · 그물 풀기", new Vector2(151, 15), new Vector2(145, 26), 12, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
         }
 
@@ -157,7 +161,7 @@ namespace TeumsaeSwim
             hintLabel.text = player.baitAiming ? player.baitAimStrength > 0 ? "조준 " + Mathf.RoundToInt(player.baitAimStrength * 100) + "% · 놓으면 발사 / 중앙으로 취소" : "드래그로 방향·거리 조절 · 중앙에서 놓으면 취소" :
                 messageTime > 0 ? temporaryMessage : game.elapsed < 3f ? "왼쪽 스틱을 드래그해 이동 · 출구를 찾아요" : player.nearNet ? "이동하면서 꾹 눌러도 그물이 풀려요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : player.hasCargo ? "진주를 챙겼어요! 출구까지 가져가요" : "미끼 버튼을 드래그해 조준하고, 풀숲에 숨어요";
             holdCaption.text = player.nearNet ? "그물 풀기" : player.squeezed ? "틈 통과 중" : "틈 통과 · 그물 풀기";
-            holdFace.color = player.working ? new Color32(255, 238, 164, 255) : SwimArt.yellow;
+            holdFace.color = player.working ? new Color32(255, 238, 164, 255) : holdFeedback.pressed ? new Color32(235, 195, 82, 255) : SwimArt.yellow;
             netRing.fillAmount = player.nearNet ? player.netProgress : 0;
             netCallout.gameObject.SetActive(player.nearNet);
             netLabel.text = "그물 해제 " + Mathf.RoundToInt(player.netProgress * 100) + "%";

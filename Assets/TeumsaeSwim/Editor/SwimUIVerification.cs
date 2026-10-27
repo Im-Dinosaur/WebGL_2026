@@ -12,6 +12,13 @@ namespace TeumsaeSwim.Editor
     {
         private static int checks; //통과한 UI와 점수 검사 수
 
+        public static void verifyFeedbackAndBuild() //버튼 효과와 조준 회귀 검사 후 기존 공개 경로로 빌드
+        {
+            run();
+            BaitAimVerification.run();
+            SwimProjectSetup.build();
+        }
+
         public static void run() //별 경계 조건과 실제 UI 입력 및 전환 검사
         {
             checks = 0;
@@ -19,6 +26,7 @@ namespace TeumsaeSwim.Editor
             SwimGame game = UnityEngine.Object.FindFirstObjectByType<SwimGame>(); //기존 씬 게임
             Player player = UnityEngine.Object.FindFirstObjectByType<Player>(); //실제 입력 대상
             GameSessionComponent session = game.GetComponent<GameSessionComponent>(); //별 판정 대상
+            require(session.timeGoalFor(SwimDifficulty.Challenge) == 180f && session.timeGoalFor(SwimDifficulty.Normal) == 240f && session.timeGoalFor(SwimDifficulty.Practice) == 180f, "Challenge is three minutes while other goals remain unchanged");
             for (int i = 0; i < 3; i++)
             {
                 SwimDifficulty difficulty = (SwimDifficulty)i; //검사할 난이도
@@ -50,6 +58,7 @@ namespace TeumsaeSwim.Editor
             session.home();
             invoke(player, "Awake");
             invoke(game, "Start");
+            verifyFeedback(game);
             click(game, "Button 플레이 방법");
             require(active(game, "Help"), "Help opens from home");
             click(game, "Button 포식자 도감");
@@ -66,12 +75,22 @@ namespace TeumsaeSwim.Editor
             PlayerInputComponent input = player.GetComponent<PlayerInputComponent>(); //실제 입력 상태
             stick.OnPointerDown(moveFinger);
             hold.OnPointerDown(holdFinger);
+            UIButtonFeedbackComponent holdEffect = hold.GetComponent<UIButtonFeedbackComponent>(); //동시 누름의 표시 대상
+            holdEffect.OnPointerDown(holdFinger);
+            animate(holdEffect, .07f);
             input.sample();
             require(input.moveInput.sqrMagnitude > .01f && input.holdInput, "Move and hold work simultaneously");
+            require(holdEffect.pressed && hold.transform.localScale == Vector3.one, "Hold feedback preserves movement input area");
+            holdEffect.OnPointerExit(holdFinger);
+            require(holdEffect.pressed, "Hold feedback remains pressed outside its area");
             hold.OnPointerUp(moveFinger);
+            holdEffect.OnPointerUp(moveFinger);
             input.sample();
             require(input.holdInput, "Other finger cannot release held action");
+            require(holdEffect.pressed, "Other finger cannot release hold feedback");
             game.pause();
+            animate(holdEffect, .01f);
+            require(!holdEffect.pressed, "Hidden gameplay panel clears feedback");
             input.sample();
             require(input.moveInput == Vector2.zero && !input.holdInput, "Pause clears both touch owners");
             require(active(game, "Pause") && !active(game, "HUD"), "Pause blocks gameplay controls");
@@ -98,6 +117,52 @@ namespace TeumsaeSwim.Editor
             }
             Debug.Log("SUMBAKKOGI_UI_VERIFIED: " + checks + " checks");
             EditorSceneManager.OpenScene(SwimProjectSetup.scenePath);
+        }
+
+        private static void verifyFeedback(SwimGame game) //실제 버튼의 점유와 취소 및 표시 전용 변형 검사
+        {
+            require(game.GetComponentsInChildren<Button>(true).All(item => item.GetComponent<UIButtonFeedbackComponent>() != null), "Every menu and bait button has feedback");
+            Button button = game.GetComponentsInChildren<Button>().Single(item => item.name == "Button 도전"); //현재 홈의 도전 버튼
+            UIButtonFeedbackComponent effect = button.GetComponent<UIButtonFeedbackComponent>(); //실제 연결된 효과
+            RectTransform area = button.GetComponent<RectTransform>(); //변하면 안 되는 입력 기준
+            RectTransform face = button.targetGraphic.rectTransform; //눌리는 표시 면
+            Vector2 size = area.sizeDelta; //원래 터치 크기
+            Vector2 position = area.anchoredPosition; //원래 터치 위치
+            var finger = new PointerEventData(EventSystem.current) { pointerId = 71 }; //점유할 손가락
+            var other = new PointerEventData(EventSystem.current) { pointerId = 72 }; //개입하면 안 되는 손가락
+            ExecuteEvents.Execute(button.gameObject, finger, ExecuteEvents.pointerDownHandler);
+            animate(effect, .07f);
+            require(effect.pressed && face.localScale.x < .97f, "Pointer down visibly depresses the actual button face");
+            require(area.sizeDelta == size && area.anchoredPosition == position && area.localScale == Vector3.one, "Button effect keeps touch position and area unchanged");
+            effect.OnPointerDown(other);
+            effect.OnPointerUp(other);
+            require(effect.pressed, "Second finger cannot steal or release feedback");
+            effect.OnPointerExit(finger);
+            effect.OnPointerUp(finger);
+            animate(effect, .3f);
+            Image ripple = area.Find("Touch ripple").GetComponent<Image>(); //취소와 발산 표시
+            require(!effect.pressed && face.localScale == Vector3.one && ripple.color.a == 0, "Dragging out cancels and restores menu feedback");
+            effect.OnPointerDown(finger);
+            animate(effect, .07f);
+            effect.OnPointerUp(finger);
+            animate(effect, .05f);
+            require(!effect.pressed && ripple.color.a > 0 && !ripple.raycastTarget, "Release emits a nonblocking short ripple");
+            animate(effect, .3f);
+            require(face.localScale == Vector3.one && ripple.color.a == 0, "Release settles without persistent scaling or animation");
+            button.interactable = false;
+            effect.OnPointerDown(finger);
+            animate(effect, .07f);
+            require(!effect.pressed && face.localScale == Vector3.one, "Disabled buttons do not react");
+            button.interactable = true;
+            effect.OnPointerDown(finger);
+            animate(effect, .07f);
+            invoke(effect, "OnDisable");
+            require(!effect.pressed && face.localScale == Vector3.one, "Panel disable restores the visual state immediately");
+        }
+
+        private static void animate(UIButtonFeedbackComponent effect, float deltaTime) //에디터에서도 동일한 표시 계산 한 단계 실행
+        {
+            typeof(UIButtonFeedbackComponent).GetMethod("animate", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(effect, new object[] { deltaTime });
         }
 
         private static bool active(SwimGame game, string name) //생성된 화면의 실제 활성 상태

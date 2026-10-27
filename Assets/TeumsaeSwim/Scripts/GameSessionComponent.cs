@@ -6,7 +6,7 @@ namespace TeumsaeSwim
     {
         [SerializeField, Min(1f)] private float practiceTimeGoal = 180f; //연습 난이도 시간 별의 목표 초
         [SerializeField, Min(1f)] private float normalTimeGoal = 240f; //기본 난이도 시간 별의 목표 초
-        [SerializeField, Min(1f)] private float challengeTimeGoal = 300f; //도전 난이도 시간 별의 목표 초
+        [SerializeField, Min(1f)] private float challengeTimeGoal = 180f; //도전 난이도 시간 별의 목표 초
         public SwimPhase phase { get; private set; } = SwimPhase.Home; //현재 게임 단계
         public SwimDifficulty difficulty { get; private set; } //현재 난이도
         public float elapsed { get; private set; } //실제 플레이 시간

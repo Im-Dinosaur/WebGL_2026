@@ -313,7 +313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.GameSessionComponent
   practiceTimeGoal: 180
   normalTimeGoal: 240
-  challengeTimeGoal: 300
+  challengeTimeGoal: 180
 --- !u!4 &625983716
 Transform:
   m_ObjectHideFlags: 0
