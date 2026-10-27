@@ -59,6 +59,7 @@ namespace TeumsaeSwim
             interaction.tick(position, input.moveInput, movement.facing, input.holdInput, fireBait, deltaTime, baitDirection, baitStrength);
             movement.tick(input.moveInput, input.holdInput, interaction.working, deltaTime);
             interaction.collectCargo(position, radius);
+            interaction.collectBaitSupply(position, radius);
             if (!wasSqueezed && movement.squeezed) cue?.Invoke(SwimCue.Squeeze);
             visual.tick(movement.facing, movement.squeezed, movement.moving, hidden, deltaTime);
             baitAim.tick(position, input.baitAimDirection, input.baitAimStrength, input.baitAiming && baitCount > 0);

@@ -10,6 +10,7 @@ namespace TeumsaeSwim
         [SerializeField] private MazeTileVisualComponent visual; //타일 지형 표시 구성 요소
         [SerializeField] private MazeBaitComponent bait; //미끼 발사와 수명 구성 요소
         [SerializeField] private MazeItemComponent items; //진주 배치와 획득 구성 요소
+        [SerializeField] private MazeBaitSupplyComponent supplies; //필드 미끼 보급 구성 요소
         public MazeData data { get; private set; } //현재 미로
         public IReadOnlyList<BaitData> baits => bait.baits; //현재 날아가거나 배치된 미끼
 
@@ -20,12 +21,24 @@ namespace TeumsaeSwim
             visual.initialize(data, terrain.gapSize, terrain.hidingRadius);
             bait.initialize(this);
             items.initialize(this);
+            supplies.initialize(this, difficulty, items.cell);
         }
 
-        public void tick(float deltaTime) //미끼 수명과 진주 표시 갱신
+        public void tick(float deltaTime, Vector2? playerPosition = null) //게임 시간에 따른 미끼 수명과 보급 및 진주 표시 갱신
         {
             bait.tick(deltaTime);
             items.tick(deltaTime);
+            supplies.tick(deltaTime, playerPosition);
+        }
+
+        public int predatorCountFor(SwimDifficulty difficulty) //메뉴에 제공할 실제 난이도별 포식자 수
+        {
+            return generation.predatorCountFor(difficulty);
+        }
+
+        public bool tryCollectBaitSupply(Vector2 position, float radius) //필드 미끼와 플레이어 접촉 전달
+        {
+            return supplies.tryCollect(position, radius);
         }
 
         public bool tryCollectItem(Vector2 position, float radius) //플레이어 접촉에 따른 일회성 진주 획득 전달

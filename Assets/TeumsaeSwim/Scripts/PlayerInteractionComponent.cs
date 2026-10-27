@@ -6,6 +6,7 @@ namespace TeumsaeSwim
     public sealed class PlayerInteractionComponent : MonoBehaviour
     {
         [SerializeField] private int initialBaits = 2; //시작 미끼 개수
+        [SerializeField, Min(1)] private int maximumBaits = 4; //보유 가능한 미끼 수
         private Maze maze; //지형 진입점
         private bool previousWorking; //직전 그물 작업 상태
         private int netTarget = -1; //현재 그물 대상
@@ -20,7 +21,7 @@ namespace TeumsaeSwim
         public void initialize(Maze world) //미끼와 상호작용 상태 초기화
         {
             maze = world;
-            baitCount = initialBaits;
+            baitCount = Mathf.Clamp(initialBaits, 0, maximumBaits);
             hasCargo = false;
             working = false;
             previousWorking = false;
@@ -59,6 +60,14 @@ namespace TeumsaeSwim
             if (hasCargo || !maze.tryCollectItem(position, radius)) return;
             hasCargo = true;
             message = "진주를 찾았어! 출구까지 무사히 가져가자";
+            cue?.Invoke(SwimCue.Pickup);
+        }
+
+        public void collectBaitSupply(Vector2 position, float radius) //가방에 여유가 있을 때 필드 미끼를 하나 획득
+        {
+            if (baitCount >= maximumBaits || !maze.tryCollectBaitSupply(position, radius)) return;
+            baitCount++;
+            message = "미끼 +1! " + baitCount + "/" + maximumBaits + "개 보유";
             cue?.Invoke(SwimCue.Pickup);
         }
     }

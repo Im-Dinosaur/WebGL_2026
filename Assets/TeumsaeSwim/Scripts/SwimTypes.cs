@@ -9,7 +9,7 @@ namespace TeumsaeSwim
     public enum TerrainKind { Water, Wall, Gap, Net, Grass }
     public enum PredatorState { Patrol, Notice, Chase, Return, Lure }
     public enum PredatorKind { Balanced, Scout, Alert, Sprinter } //종류별 능력치와 그림의 식별자
-    public enum SwimCue { Bait, Squeeze, Tear, Open, Notice, Chase, Win, Lose, Pickup }
+    public enum SwimCue { Bait, Squeeze, Tear, Open, Notice, Chase, Win, Lose, Pickup, Heartbeat }
 
     [Serializable]
     public sealed class MazeCell

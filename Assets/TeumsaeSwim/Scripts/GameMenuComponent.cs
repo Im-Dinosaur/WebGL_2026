@@ -25,7 +25,6 @@ namespace TeumsaeSwim
         private Text resultEscape; //탈출 별 결과 사유
         private Text resultCount; //획득한 별 개수
         private GameUIIconComponent homeSound; //홈 소리 버튼 그림
-        private Image hero; //홈에서 헤엄치는 물고기
         private readonly Button[] difficulties = new Button[3]; //선택 가능한 난이도
         private readonly GameUIIconComponent[] stars = new GameUIIconComponent[3]; //결과 별 그림
         private readonly GameUIIconComponent[] checks = new GameUIIconComponent[3]; //난이도 선택 표식
@@ -44,43 +43,37 @@ namespace TeumsaeSwim
             selectDifficulty(selected);
         }
 
-        private void Update() //홈 물고기의 작은 유영 연출
-        {
-            if (hero != null && homePanel.activeSelf)
-            {
-                hero.rectTransform.anchoredPosition = new Vector2(Mathf.Sin(Time.unscaledTime * .6f) * 4, 124 + Mathf.Sin(Time.unscaledTime * 1.4f) * 6);
-                hero.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(Time.unscaledTime * .9f) * 2);
-            }
-        }
-
-        private void createHome() //바닷속 로고와 캐릭터를 중심으로 한 시작 화면
+        private void createHome() //숨은 물고기 배경과 난이도 및 큰 시작 버튼으로 구성한 홈
         {
             RectTransform outer = style.screen("Home", true); //홈 전체 배경
             homePanel = outer.gameObject;
             RectTransform root = style.sheet(outer, "Home content"); //세로 메뉴 배치
             Button sound = style.button(root, "", new Vector2(195, 369), Vector2.one * 44, () => game.toggleMute()); //홈 소리 버튼
             homeSound = style.icon(sound.GetComponent<RectTransform>(), SwimUIIcon.Sound, new Vector2(0, 4), 23, GameUIStyleComponent.cream);
-            style.logo(root, new Vector2(0, 283), new Vector2(430, 148));
-            hero = style.illustration(root, "Player hero", style.fish, new Vector2(0, 124), new Vector2(290, 205));
+            style.logo(root, new Vector2(0, 278), new Vector2(435, 145));
+            style.text(root, "난이도", new Vector2(0, 0), new Vector2(180, 34), 23, SwimArt.mint, TextAnchor.MiddleCenter, true);
+            style.picture(root, "Difficulty line left", "box", new Vector2(-88, 0), new Vector2(30, 1), SwimArt.mint);
+            style.picture(root, "Difficulty line right", "box", new Vector2(88, 0), new Vector2(30, 1), SwimArt.mint);
             string[] goals = { "탈출", "시간", "진주" }; //별 목표 이름
+            style.card(root, "Star goals", new Vector2(0, -319), new Vector2(302, 78), new Color32(9, 42, 58, 220), GameUIStyleComponent.border);
             for (int i = 0; i < 3; i++)
             {
-                style.icon(root, SwimUIIcon.Star, new Vector2((i - 1) * 83, -27), 27, SwimArt.mint);
-                style.text(root, goals[i], new Vector2((i - 1) * 83, -57), new Vector2(78, 25), 15, GameUIStyleComponent.cream);
+                style.icon(root, SwimUIIcon.Star, new Vector2((i - 1) * 91, -305), 28, SwimArt.mint);
+                style.text(root, goals[i], new Vector2((i - 1) * 91, -335), new Vector2(78, 25), 16, GameUIStyleComponent.cream);
             }
             for (int i = 0; i < 3; i++)
             {
                 SwimDifficulty value = (SwimDifficulty)i; //선택할 난이도
-                Button choice = style.button(root, GameUIComponent.difficultyName(value), new Vector2((i - 1) * 130, -121), new Vector2(120, 51), () => selectDifficulty(value), false, 23); //난이도 선택
+                Button choice = style.button(root, GameUIComponent.difficultyName(value), new Vector2((i - 1) * 139, -56), new Vector2(130, 57), () => selectDifficulty(value), false, 23); //난이도 선택
                 difficulties[i] = choice;
                 checks[i] = style.icon(choice.GetComponent<RectTransform>(), SwimUIIcon.Check, new Vector2(-40, 4), 15, SwimArt.ink);
             }
-            recordLabel = style.text(root, "", new Vector2(0, -174), new Vector2(422, 28), 15, GameUIStyleComponent.cream);
-            RectTransform goalPill = style.card(root, "Difficulty detail", new Vector2(0, -204), new Vector2(326, 28), GameUIStyleComponent.panel, GameUIStyleComponent.border).rectTransform; //밝은 배경에서도 읽히는 난이도 안내
-            goalLabel = style.text(goalPill, "", Vector2.zero, new Vector2(310, 27), 12, GameUIStyleComponent.cream);
-            Button start = style.button(root, "헤엄 시작하기", new Vector2(0, -270), new Vector2(388, 72), () => game.begin(selected), true, 28); //시작 동작
-            style.icon(start.GetComponent<RectTransform>(), SwimUIIcon.Chevron, new Vector2(153, 4), 25, SwimArt.ink);
-            style.button(root, "헤엄 안내", new Vector2(0, -354), new Vector2(286, 46), openHelp, false, 19);
+            style.text(root, "미끼를 모으고, 포식자를 피해 출구로!", new Vector2(0, -111), new Vector2(438, 28), 16, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
+            goalLabel = style.text(root, "", new Vector2(0, -144), new Vector2(434, 27), 13, GameUIStyleComponent.cream);
+            recordLabel = style.text(root, "", new Vector2(0, -174), new Vector2(422, 26), 13, GameUIStyleComponent.muted);
+            Button start = style.startButton(root, new Vector2(0, -235), () => game.begin(selected)); //시작 동작
+            style.icon(start.GetComponent<RectTransform>(), SwimUIIcon.Chevron, new Vector2(162, 4), 26, SwimArt.ink);
+            style.button(root, "플레이 방법", new Vector2(0, -387), new Vector2(270, 44), openHelp, false, 19);
         }
 
         private RectTransform modal(string name, string title) //공통 메뉴 배경과 제목
@@ -139,7 +132,7 @@ namespace TeumsaeSwim
             string[] bodies = {
                 "스틱으로 움직여 빛나는 출구를 찾아요.\n시작·도착의 민트색 구역에서는 안전해요.",
                 "좁은 틈에서는 꾹 누른 채 이동해요.\n그물도 움직이며 꾹 2초! 진행도는 유지돼요.",
-                "풀숲에 완전히 숨으면 닿아도 잡히지 않아요.\n미끼 버튼을 드래그해 조준! 놓으면 발사해요.",
+                "풀숲에 완전히 숨으면 닿아도 잡히지 않아요.\n미끼는 드래그해 발사하고 주워 보충해요.",
                 "탈출 + 시간 내 도착 + 진주 운반 = 별 3개!\n시간이 지나도 계속할 수 있어요. 잡히면 별 0개."
             }; //조작과 점수 규칙
             for (int i = 0; i < 4; i++)
@@ -156,7 +149,8 @@ namespace TeumsaeSwim
                 style.text(card, profile.title, new Vector2(46, 21), new Vector2(270, 30), 19, profile.color, TextAnchor.MiddleLeft, true);
                 style.text(card, profile.hint, new Vector2(46, -16), new Vector2(270, 49), 14, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
             }
-            style.text(root, "PC  WASD 이동 · SPACE 꾹 · 마우스 드래그 조준\nE 시선 방향 빠른 발사 · ESC 멈춤", new Vector2(0, -275), new Vector2(442, 44), 12, GameUIStyleComponent.muted);
+            style.text(root, "PC  WASD 이동 · SPACE 꾹 · 마우스 드래그 조준\nE 빠른 발사 · ESC 멈춤 · 미끼 최대 4개 / 보급 30초", new Vector2(0, -275), new Vector2(442, 44), 12, GameUIStyleComponent.muted);
+            style.text(root, "BGM: Underwater Ambient Pad · isaiah658 · CC0", new Vector2(0, -309), new Vector2(442, 20), 10, GameUIStyleComponent.muted);
             style.button(root, "알겠어, 헤엄칠 준비 됐어", new Vector2(0, -350), new Vector2(390, 57), () => helpPanel.SetActive(false), true, 20);
             showHelpPage(false);
             helpPanel.SetActive(false);
@@ -222,7 +216,7 @@ namespace TeumsaeSwim
             }
             float best = game.bestTime(value); //난이도별 최고 기록
             recordLabel.text = best > 0 ? "최고 기록 " + GameUIComponent.formatTime(best) : "첫 탈출 기록을 만들어 보세요";
-            int count = value == SwimDifficulty.Practice ? 2 : value == SwimDifficulty.Normal ? 4 : 6; //배치한 포식자 수
+            int count = game.predatorCountFor(value); //Inspector 설정과 동일한 포식자 수
             goalLabel.text = "포식자 " + count + "마리  ·  시간 별 " + GameUIComponent.clockTime(game.timeGoalFor(value)) + " 이내";
         }
     }

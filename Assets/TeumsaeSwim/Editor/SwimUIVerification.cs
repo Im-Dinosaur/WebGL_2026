@@ -50,13 +50,13 @@ namespace TeumsaeSwim.Editor
             session.home();
             invoke(player, "Awake");
             invoke(game, "Start");
-            click(game, "Button 헤엄 안내");
+            click(game, "Button 플레이 방법");
             require(active(game, "Help"), "Help opens from home");
             click(game, "Button 포식자 도감");
             require(active(game, "Predators page") && !active(game, "Rules page"), "Help tabs switch page");
             click(game, "Button 알겠어, 헤엄칠 준비 됐어");
             click(game, "Button 기본");
-            click(game, "Button 헤엄 시작하기");
+            click(game, "Button 게임 시작");
             require(game.phase == SwimPhase.Playing && game.difficulty == SwimDifficulty.Normal, "Selected difficulty starts through actual button");
             TouchControlComponent stick = game.GetComponentsInChildren<TouchControlComponent>().Single(item => item.name == "Move stick"); //이동 터치
             TouchControlComponent hold = game.GetComponentsInChildren<TouchControlComponent>().Single(item => item.name == "Hold action"); //꾹 터치

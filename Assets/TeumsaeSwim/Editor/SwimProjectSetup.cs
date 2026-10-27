@@ -42,7 +42,7 @@ namespace TeumsaeSwim.Editor
             cameraObject.transform.position = new Vector3(0, 0, -10);
             link(cameraObject.GetComponent<CameraFollowComponent>(), "gameCamera", camera);
 
-            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(MazeBaitComponent), typeof(MazeItemComponent), typeof(Maze)); //미로 조립
+            var mazeObject = new GameObject("Maze", typeof(MazeGenerationComponent), typeof(MazeTerrainComponent), typeof(MazeBaitComponent), typeof(MazeItemComponent), typeof(MazeBaitSupplyComponent), typeof(Maze)); //미로 조립
             Maze maze = mazeObject.GetComponent<Maze>(); //미로 진입점
             link(maze, "generation", mazeObject.GetComponent<MazeGenerationComponent>());
             link(maze, "terrain", mazeObject.GetComponent<MazeTerrainComponent>());
@@ -50,6 +50,8 @@ namespace TeumsaeSwim.Editor
             link(maze, "items", mazeObject.GetComponent<MazeItemComponent>());
             link(mazeObject.GetComponent<MazeBaitComponent>(), "art", art);
             link(mazeObject.GetComponent<MazeItemComponent>(), "art", art);
+            link(maze, "supplies", mazeObject.GetComponent<MazeBaitSupplyComponent>());
+            link(mazeObject.GetComponent<MazeBaitSupplyComponent>(), "art", art);
 
             var playerObject = new GameObject("Player", typeof(PlayerInputComponent), typeof(PlayerMovementComponent), typeof(PlayerInteractionComponent), typeof(PlayerVisualComponent), typeof(Player)); //플레이어 조립
             Player player = playerObject.GetComponent<Player>(); //플레이어 진입점
@@ -87,6 +89,8 @@ namespace TeumsaeSwim.Editor
             if (File.Exists(PredatorTypeSetup.atlasPath)) PredatorTypeSetup.connect();
             if (File.Exists("Assets/TeumsaeSwim/Art/UI/OceanHome.png")) SwimUISetup.connect();
             if (File.Exists(MazeTileSetup.surfacePath)) MazeTileSetup.connect();
+            if (File.Exists("Assets/TeumsaeSwim/Art/UI/OceanHomeRefresh.png")) SwimRefreshSetup.connect();
+            if (File.Exists("Assets/TeumsaeSwim/Audio/UnderwaterAmbientPad.ogg")) SwimAudioSetup.connect();
             Debug.Log("TEUMSAE_SETUP_OK: " + scenePath);
         }
 
@@ -160,9 +164,9 @@ namespace TeumsaeSwim.Editor
             generation.FindProperty("practiceSize").intValue = 25;
             generation.FindProperty("normalSize").intValue = 31;
             generation.FindProperty("challengeSize").intValue = 37;
-            generation.FindProperty("practicePredators").intValue = 2;
-            generation.FindProperty("normalPredators").intValue = 4;
-            generation.FindProperty("challengePredators").intValue = 6;
+            generation.FindProperty("practicePredators").intValue = 3;
+            generation.FindProperty("normalPredators").intValue = 6;
+            generation.FindProperty("challengePredators").intValue = 9;
             generation.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(maze.gameObject.scene);
             EditorSceneManager.SaveScene(maze.gameObject.scene);

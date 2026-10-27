@@ -261,7 +261,7 @@ namespace TeumsaeSwim.Editor
                     MazeData data = generator.generate(seed, difficulty); //서로 다른 시드의 미로
                     require(generator.validate(data), "Connected random maze " + difficulty + " seed " + seed);
                     require(data.width == (difficulty == SwimDifficulty.Practice ? 25 : difficulty == SwimDifficulty.Normal ? 31 : 37) && data.height == data.width, "Two-dimensional maze dimensions");
-                    require(data.homes.Count == (difficulty == SwimDifficulty.Practice ? 2 : difficulty == SwimDifficulty.Normal ? 4 : 6), "Predator count");
+                    require(data.homes.Count == (difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 6 : 9), "Predator count");
                     require(data.route.Count >= data.width * 1.4f, "Endpoint path distance");
                     require(Vector2.Distance(data.center(data.start), data.center(data.exit)) >= data.width * data.tileSize * .4f, "Endpoint spatial separation");
                     int[] connected = data.distancesFrom(data.start); //시작과 연결된 물길
@@ -389,7 +389,7 @@ namespace TeumsaeSwim.Editor
             bool hadRecord = PlayerPrefs.HasKey(recordKey); //기존 기록 존재 여부
             float savedRecord = PlayerPrefs.GetFloat(recordKey); //검사 전 최고 기록
             int pickupCues = 0; //실제 획득 알림 횟수
-            Action<SwimCue> countPickup = cue => { if (cue == SwimCue.Pickup) pickupCues++; }; //중복 획득 감지
+            Action<SwimCue> countPickup = cue => { if (cue == SwimCue.Pickup && player.message.StartsWith("진주를 찾았어")) pickupCues++; }; //필드 미끼와 구분한 진주 중복 획득 감지
             player.cue += countPickup;
             try
             {
@@ -416,9 +416,10 @@ namespace TeumsaeSwim.Editor
                 require(!maze.tryCollectItem(itemPosition, player.radius), "Duplicate pickup is rejected");
                 update.Invoke(game, null);
                 require(uiText(ui, "cargoLabel") == "진주 운반 중", "HUD shows carried pearl");
+                int inventoryBeforeShot = player.baitCount; //경로에서 보충했을 수 있는 실제 미끼 수
                 player.useBait();
                 player.tick(.02f);
-                require(player.hasCargo && player.baitCount == 1 && pickupCues == 1, "Bait use preserves cargo without duplicate pickup cue");
+                require(player.hasCargo && player.baitCount == inventoryBeforeShot - 1 && pickupCues == 1, "Bait use preserves cargo without duplicate pickup cue");
                 game.pause();
                 update.Invoke(game, null);
                 require(player.hasCargo && !items.available && !game.cargoDelivered, "Pause preserves inventory without delivering or respawning item");

@@ -27,6 +27,7 @@ namespace TeumsaeSwim
         public int stars => session.stars; //이번 판의 획득 별
         public IReadOnlyList<PredatorTypeProfile> predatorTypes => roster.types; //도움말에 제공할 종류별 설정
         public bool muted => audioComponent.muted; //현재 음소거 여부
+        public int predatorCountFor(SwimDifficulty value) => maze.predatorCountFor(value); //메뉴에 제공할 실제 포식자 수
         public float progress => maze.data == null ? 0f : maze.progressAt(player.position); //남은 통로 거리에 따른 진행률
         public string danger { get; private set; } = ""; //가장 높은 위험 상태 안내
 
@@ -38,6 +39,7 @@ namespace TeumsaeSwim
             player.cue += audioComponent.play;
             ui.initialize(this, player);
             ui.showPhase();
+            audioComponent.setPhase(phase);
         }
 
         private void OnDestroy() //플레이어 이벤트 연결 해제
@@ -54,18 +56,21 @@ namespace TeumsaeSwim
             }
             if (phase != SwimPhase.Playing) return;
             float deltaTime = Mathf.Min(Time.deltaTime, .05f); //긴 프레임에서의 급격한 이동 방지
-            maze.tick(deltaTime);
+            maze.tick(deltaTime, player.position);
             player.tick(deltaTime);
             bool caught = false; //이번 프레임 접촉 결과
             int dangerRank = 0; //화면에 표시할 위험 단계
+            float nearestPredator = float.PositiveInfinity; //가장 가까운 포식자 거리
             foreach (Predator predator in predators)
             {
                 predator.tick(deltaTime);
+                nearestPredator = Mathf.Min(nearestPredator, Vector2.Distance(player.position, predator.position));
                 caught |= !player.safe && !player.hidden && Vector2.Distance(player.position, predator.position) < player.radius + predator.radius;
                 dangerRank = Mathf.Max(dangerRank, predator.state == PredatorState.Chase ? 3 : predator.state == PredatorState.Notice ? 2 : predator.state == PredatorState.Return ? 1 : 0);
             }
             danger = dangerRank == 3 ? "추격 중! 풀숲에 숨거나 바위 뒤로 피하자" : dangerRank == 2 ? "들키는 중! 시야를 벗어나자" : dangerRank == 1 ? "포식자가 순찰로 돌아가는 중" : "";
             bool escaped = Vector2.Distance(player.position, maze.data.center(maze.data.exit)) < .65f; //출구 도달 결과
+            audioComponent.tick(deltaTime, nearestPredator, dangerRank == 3, player.safe, player.working);
             session.advance(deltaTime, caught, escaped, player.hasCargo);
             cameraFollow.setPlayfield(ui.playfield);
             cameraFollow.tick(deltaTime);
@@ -74,6 +79,7 @@ namespace TeumsaeSwim
             {
                 player.resetInput();
                 session.saveRecord();
+                audioComponent.setPhase(phase);
                 audioComponent.play(phase == SwimPhase.Won ? SwimCue.Win : SwimCue.Lose);
                 ui.showPhase();
             }
@@ -101,6 +107,7 @@ namespace TeumsaeSwim
                 predators.Add(predator);
             }
             session.begin(value);
+            audioComponent.setPhase(phase);
             danger = "";
             cameraFollow.setPlayfield(ui.playfield);
             cameraFollow.initialize(player, maze);
@@ -111,6 +118,7 @@ namespace TeumsaeSwim
         public void pause() //모든 게임 시간을 멈추고 입력 해제
         {
             session.pause();
+            audioComponent.setPhase(phase);
             player.resetInput();
             ui.showPhase();
         }
@@ -119,12 +127,14 @@ namespace TeumsaeSwim
         {
             player.resetInput();
             session.resume();
+            audioComponent.setPhase(phase);
             ui.showPhase();
         }
 
         public void home() //현재 판을 종료하고 시작 화면 표시
         {
             session.home();
+            audioComponent.setPhase(phase);
             player.resetInput();
             ui.showPhase();
         }

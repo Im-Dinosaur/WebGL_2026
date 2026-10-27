@@ -52,7 +52,7 @@ namespace TeumsaeSwim.Editor
             foreach (SwimDifficulty difficulty in Enum.GetValues(typeof(SwimDifficulty)))
             {
                 var combinations = new HashSet<string>(); //시드에 따라 바뀌는 순서
-                int count = difficulty == SwimDifficulty.Practice ? 2 : difficulty == SwimDifficulty.Normal ? 4 : 6; //기존 난이도별 수
+                int count = difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 6 : 9; //기존 난이도별 수
                 for (int seed = 0; seed < 200; seed++)
                 {
                     PredatorTypeProfile[] first = roster.createRoster(seed, count, difficulty); //첫 조합
@@ -60,7 +60,7 @@ namespace TeumsaeSwim.Editor
                     require(first.SequenceEqual(replay), "Deterministic roster " + difficulty);
                     require(first.Length == count, "Population unchanged");
                     require(first.Take(Mathf.Min(4, count)).Select(profile => profile.type).Distinct().Count() == Mathf.Min(4, count), "No duplicates in first bag");
-                    require(first.GroupBy(profile => profile.type).All(group => group.Count() <= 2), "No concentrated specialist population");
+                    require(first.GroupBy(profile => profile.type).All(group => group.Count() <= Mathf.CeilToInt(count / 4f)), "No concentrated specialist population");
                     if (difficulty == SwimDifficulty.Practice) require(first[0].type == PredatorKind.Balanced, "Practice always includes balanced fish");
                     combinations.Add(string.Join(",", first.Select(profile => profile.type)));
                 }
@@ -177,7 +177,7 @@ namespace TeumsaeSwim.Editor
                 game.begin(SwimDifficulty.Normal, false);
                 Predator[] predators = game.GetComponentsInChildren<Predator>(); //실제 네 종류 배치
                 require(before.SequenceEqual(predators.Select(predator => predator.kind)), "Same maze retry keeps species order");
-                Predator subject = predators.Single(predator => predator.kind == kind); //접촉을 검사할 종류
+                Predator subject = predators.First(predator => predator.kind == kind); //접촉을 검사할 종류
                 foreach (Predator predator in predators) predator.transform.position = maze.data.center(maze.data.exit);
                 int grass = Array.FindIndex(maze.data.cells, cell => cell.kind == TerrainKind.Grass); //이번 미로의 수풀
                 player.transform.position = maze.data.center(grass);

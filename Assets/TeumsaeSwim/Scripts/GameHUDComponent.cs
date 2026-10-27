@@ -155,7 +155,7 @@ namespace TeumsaeSwim
             if (!string.IsNullOrEmpty(player.message)) { temporaryMessage = player.message; messageTime = 3; }
             messageTime -= deltaTime;
             hintLabel.text = player.baitAiming ? player.baitAimStrength > 0 ? "조준 " + Mathf.RoundToInt(player.baitAimStrength * 100) + "% · 놓으면 발사 / 중앙으로 취소" : "드래그로 방향·거리 조절 · 중앙에서 놓으면 취소" :
-                messageTime > 0 ? temporaryMessage : player.nearNet ? "이동하면서 꾹 눌러도 그물이 풀려요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : player.hasCargo ? "진주를 챙겼어요! 출구까지 가져가요" : "미끼 버튼을 드래그해 조준하고, 풀숲에 숨어요";
+                messageTime > 0 ? temporaryMessage : game.elapsed < 3f ? "왼쪽 스틱을 드래그해 이동 · 출구를 찾아요" : player.nearNet ? "이동하면서 꾹 눌러도 그물이 풀려요" : player.squeezed ? "틈 안에서는 꾹 누른 채 움직여요" : player.hasCargo ? "진주를 챙겼어요! 출구까지 가져가요" : "미끼 버튼을 드래그해 조준하고, 풀숲에 숨어요";
             holdCaption.text = player.nearNet ? "그물 풀기" : player.squeezed ? "틈 통과 중" : "틈 통과 · 그물 풀기";
             holdFace.color = player.working ? new Color32(255, 238, 164, 255) : SwimArt.yellow;
             netRing.fillAmount = player.nearNet ? player.netProgress : 0;

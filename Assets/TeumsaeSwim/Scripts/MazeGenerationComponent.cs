@@ -11,9 +11,14 @@ namespace TeumsaeSwim
         [SerializeField, Range(17, 61)] private int normalSize = 31; //기본 미로의 한 변 칸 수
         [SerializeField, Range(17, 61)] private int challengeSize = 37; //도전 미로의 한 변 칸 수
         [SerializeField, Range(0f, .15f)] private float loopRatio = .045f; //격자 방 수에 대한 추가 우회로 비율
-        [SerializeField, Min(1)] private int practicePredators = 2; //연습 포식자 수
-        [SerializeField, Min(1)] private int normalPredators = 4; //기본 포식자 수
-        [SerializeField, Min(1)] private int challengePredators = 6; //도전 포식자 수
+        [SerializeField, Min(1)] private int practicePredators = 3; //연습 포식자 수
+        [SerializeField, Min(1)] private int normalPredators = 6; //기본 포식자 수
+        [SerializeField, Min(1)] private int challengePredators = 9; //도전 포식자 수
+
+        public int predatorCountFor(SwimDifficulty difficulty) //생성과 메뉴에서 공유하는 난이도별 포식자 수
+        {
+            return difficulty == SwimDifficulty.Practice ? practicePredators : difficulty == SwimDifficulty.Normal ? normalPredators : challengePredators;
+        }
 
         public MazeData generate(int seed, SwimDifficulty difficulty) //전체 통로와 양쪽 안전구역을 무작위 생성
         {
@@ -55,7 +60,7 @@ namespace TeumsaeSwim
             if (!placeEndpoints(data, random)) return null;
             int featureCount = difficulty == SwimDifficulty.Practice ? 4 : difficulty == SwimDifficulty.Normal ? 6 : 8; //틈과 그물의 합계
             if (!placeFeatures(data, random, featureCount)) return null;
-            int predators = difficulty == SwimDifficulty.Practice ? practicePredators : difficulty == SwimDifficulty.Normal ? normalPredators : challengePredators; //포식자 배치 수
+            int predators = predatorCountFor(difficulty); //포식자 배치 수
             if (!placePredators(data, random, Mathf.Max(1, predators))) return null;
             placeGrass(data, random);
             return data;

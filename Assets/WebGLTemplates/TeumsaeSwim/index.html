@@ -16,6 +16,7 @@
     .fish{font-size:54px;line-height:1;margin-bottom:20px;color:#ffd669}.track{width:220px;height:4px;border-radius:4px;background:#21424e;margin:24px 0 12px;overflow:hidden}.fill{height:100%;width:0;background:#ffd669;transition:width .2s}
     #status{font-size:12px;color:#adc7c7;min-height:42px}button{margin:18px;padding:13px 25px;border:0;border-radius:12px;background:#ffd669;color:#091f2d;font-size:15px;cursor:pointer}
     #error{display:none;max-width:340px;color:#f6ad9f;font-size:13px;line-height:1.7}
+    #build-version{position:absolute;right:7px;bottom:3px;font-size:10px;color:#c7e9df;background:#07172288;padding:2px 5px;pointer-events:none;border-radius:4px}
   </style>
 </head>
 <body>
@@ -27,6 +28,7 @@
       <div id="status">처음 접속하면 잠시 걸릴 수 있어요.</div><div id="error"></div>
       <button id="retry" hidden onclick="location.reload()">다시 불러오기</button>
     </div>
+    <span id="build-version" aria-label="게임 버전 1.1.0">v1.1.0</span>
   </main>
   <script>
     const canvas = document.getElementById('unity-canvas');
@@ -40,7 +42,7 @@
     }
     const config = {
       dataUrl: 'Build/{{{ DATA_FILENAME }}}', frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}', codeUrl: 'Build/{{{ CODE_FILENAME }}}',
-      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.0',
+      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.0',
       matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
     };

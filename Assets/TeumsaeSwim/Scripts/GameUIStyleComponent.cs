@@ -7,6 +7,7 @@ namespace TeumsaeSwim
     public sealed class GameUIStyleComponent : MonoBehaviour
     {
         [SerializeField] private Sprite oceanBackground; //홈 바닷속 그림
+        [SerializeField] private Sprite homeBackground; //개편한 홈 전용 숨바꼬기 그림
         [SerializeField] private Sprite titleLogo; //소제목 없는 숨바꼬기 로고
         [SerializeField] private Sprite playerFish; //메인 화면 물고기 그림
         private SwimArt art; //글꼴과 기본 도형 자원
@@ -87,11 +88,12 @@ namespace TeumsaeSwim
             if (backdrop)
             {
                 Image background = picture(outer, "Ocean background", "box", Vector2.zero, Vector2.zero, Color.white); //장식 전용 바다
-                background.sprite = oceanBackground;
+                Sprite backdropSprite = name == "Home" && homeBackground != null ? homeBackground : oceanBackground; //홈과 모달 배경을 구분
+                background.sprite = backdropSprite;
                 stretch(background.rectTransform);
                 AspectRatioFitter fit = background.gameObject.AddComponent<AspectRatioFitter>(); //화면을 빈틈없이 채우는 그림
                 fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-                fit.aspectRatio = oceanBackground == null ? 9f / 16f : oceanBackground.rect.width / oceanBackground.rect.height;
+                fit.aspectRatio = backdropSprite == null ? 9f / 16f : backdropSprite.rect.width / backdropSprite.rect.height;
             }
             return outer;
         }
@@ -134,6 +136,17 @@ namespace TeumsaeSwim
             item.colors = colors;
             item.navigation = new Navigation { mode = Navigation.Mode.None };
             text(face.rectTransform, value, Vector2.zero, size - new Vector2(20, 4), fontSize, primary ? SwimArt.ink : cream, TextAnchor.MiddleCenter, true);
+            return item;
+        }
+
+        public Button startButton(RectTransform parent, Vector2 position, Action action) //홈 전용 산호색 시작 버튼과 밝은 윗면
+        {
+            Button item = button(parent, "게임 시작", position, new Vector2(400, 74), action, true, 29); //실제 게임 시작 입력
+            item.GetComponent<Image>().color = new Color32(255, 177, 93, 255);
+            item.transform.Find("Face").GetComponent<Image>().color = new Color32(200, 84, 67, 255);
+            item.targetGraphic.color = new Color32(255, 159, 112, 255);
+            Image shine = picture(item.targetGraphic.rectTransform, "Top highlight", "pill", new Vector2(0, 28), new Vector2(339, 3), new Color32(255, 227, 171, 235)); //눌림 면의 부드러운 광택
+            shine.transform.SetAsFirstSibling();
             return item;
         }
 
