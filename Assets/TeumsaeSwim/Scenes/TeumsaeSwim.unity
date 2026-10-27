@@ -492,8 +492,10 @@ MonoBehaviour:
   challengeSize: 37
   loopRatio: 0.045
   practicePredators: 3
-  normalPredators: 6
-  challengePredators: 9
+  normalPredators: 12
+  challengePredators: 18
+  predatorSpacing: 3.5
+  mainRoutePredatorRatio: 0.7
 --- !u!4 &634707484
 Transform:
   m_ObjectHideFlags: 0

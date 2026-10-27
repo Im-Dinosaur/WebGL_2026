@@ -28,7 +28,7 @@
       <div id="status">처음 접속하면 잠시 걸릴 수 있어요.</div><div id="error"></div>
       <button id="retry" hidden onclick="location.reload()">다시 불러오기</button>
     </div>
-    <span id="build-version" aria-label="게임 버전 1.1.1">v1.1.1</span>
+    <span id="build-version" aria-label="게임 버전 1.1.2">v1.1.2</span>
   </main>
   <script>
     const canvas = document.getElementById('unity-canvas');
@@ -41,12 +41,12 @@
       document.getElementById('retry').hidden=false;
     }
     const config = {
-      dataUrl: 'Build/teumsae-swim.data.unityweb?v=86d70bba730d', frameworkUrl: 'Build/teumsae-swim.framework.js.unityweb?v=86d70bba730d', codeUrl: 'Build/teumsae-swim.wasm.unityweb?v=86d70bba730d',
-      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.1',
+      dataUrl: 'Build/teumsae-swim.data.unityweb?v=ba713f453367', frameworkUrl: 'Build/teumsae-swim.framework.js.unityweb?v=ba713f453367', codeUrl: 'Build/teumsae-swim.wasm.unityweb?v=ba713f453367',
+      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.2',
       matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
     };
-    const loader=document.createElement('script');loader.src='Build/teumsae-swim.loader.js?v=86d70bba730d';
+    const loader=document.createElement('script');loader.src='Build/teumsae-swim.loader.js?v=ba713f453367';
     loader.onerror=()=>showError('파일 다운로드 오류');
     loader.onload=()=>createUnityInstance(canvas,config,p=>{
       document.getElementById('progress').style.width=Math.round(p*100)+'%';

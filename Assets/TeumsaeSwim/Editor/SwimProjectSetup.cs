@@ -165,8 +165,8 @@ namespace TeumsaeSwim.Editor
             generation.FindProperty("normalSize").intValue = 31;
             generation.FindProperty("challengeSize").intValue = 37;
             generation.FindProperty("practicePredators").intValue = 3;
-            generation.FindProperty("normalPredators").intValue = 6;
-            generation.FindProperty("challengePredators").intValue = 9;
+            generation.FindProperty("normalPredators").intValue = 12;
+            generation.FindProperty("challengePredators").intValue = 18;
             generation.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(maze.gameObject.scene);
             EditorSceneManager.SaveScene(maze.gameObject.scene);

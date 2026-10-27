@@ -9,6 +9,9 @@ namespace TeumsaeSwim
         [SerializeField] private float patrolSpeed = 1.22f; //기본 순찰 속도
         [SerializeField] private float chaseSpeed = 3.7f; //기본 추격 속도
         [SerializeField] private float lureSpeed = 2.1f; //미끼를 향해 이동하는 속도
+        [SerializeField, Min(3)] private int patrolRange = 12; //시작 위치에서 실제 통로를 따라 순찰할 최대 칸 수
+        [SerializeField, Range(0f, 1f)] private float mainRoutePreference = .7f; //출구 경로를 순찰 목적지로 우선 선택할 확률
+        [SerializeField, Min(0f)] private float patrolPause = .35f; //목적지 도착 후 잠시 머무는 시간
         private Maze maze; //지형 진입점
         private List<int> path = new List<int>(); //현재 이동 경로
         private int pathIndex; //다음 경유지
@@ -20,6 +23,9 @@ namespace TeumsaeSwim
         private float difficultyScale; //난이도별 이동 배율
         private PredatorTypeProfile profile; //이번 포식자의 행동별 속도 설정
         private System.Random random; //순찰 선택 난수
+        private readonly HashSet<int> mainRoute = new HashSet<int>(); //플레이어와 교차할 출구 경로
+        private readonly List<int> patrolCandidates = new List<int>(); //통로로 도달 가능한 순찰 후보
+        private readonly List<int> routeCandidates = new List<int>(); //주 경로 위의 순찰 후보
         public Vector2 facing { get; private set; } = Vector2.left; //바라보는 방향
         public float radius => bodyRadius; //접촉 판정 반경
 
@@ -37,7 +43,9 @@ namespace TeumsaeSwim
             pathIndex = 0;
             goalCell = -1;
             repathTime = 0;
-            patrolWait = .8f;
+            patrolWait = patrolPause;
+            mainRoute.Clear();
+            foreach (int id in maze.data.route) mainRoute.Add(id);
         }
 
         public Vector2 patrolTarget(float deltaTime) //인근 물길 안에서 순찰 목적지 선택
@@ -47,15 +55,19 @@ namespace TeumsaeSwim
                 patrolWait -= deltaTime;
                 if (patrolWait <= 0)
                 {
-                    var candidates = new List<int>(); //도달 가능한 주변 순찰 칸
+                    patrolCandidates.Clear();
+                    routeCandidates.Clear();
+                    int[] homeDistances = maze.data.distancesFrom(home, true); //안전구역과 닫힌 장애물을 피한 순찰 구역
+                    int[] currentDistances = maze.data.distancesFrom(maze.data.cellAt(transform.position), true); //후보마다 길찾기하지 않고 한 번에 연결 확인
                     for (int id = 0; id < maze.data.cells.Length; id++)
                     {
-                        if (!maze.data.passable(id, true) || Vector2.Distance(maze.data.center(id), maze.data.center(home)) > maze.data.tileSize * 3.1f) continue;
-                        List<int> route = maze.data.findPath(maze.data.cellAt(transform.position), id, true); //순찰 후보 경로
-                        if (route.Count >= 3 && route.Count <= 9) candidates.Add(id);
+                        if (homeDistances[id] < 0 || homeDistances[id] > patrolRange || currentDistances[id] < 2 || currentDistances[id] > patrolRange) continue;
+                        patrolCandidates.Add(id);
+                        if (mainRoute.Contains(id)) routeCandidates.Add(id);
                     }
+                    List<int> candidates = routeCandidates.Count > 0 && random.NextDouble() < mainRoutePreference ? routeCandidates : patrolCandidates; //주 경로도 자주 지나가는 순찰
                     if (candidates.Count > 0) patrolGoal = candidates[random.Next(candidates.Count)];
-                    patrolWait = .8f;
+                    patrolWait = patrolPause;
                 }
             }
             return maze.data.center(patrolGoal);

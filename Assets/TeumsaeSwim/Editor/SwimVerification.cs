@@ -261,7 +261,20 @@ namespace TeumsaeSwim.Editor
                     MazeData data = generator.generate(seed, difficulty); //서로 다른 시드의 미로
                     require(generator.validate(data), "Connected random maze " + difficulty + " seed " + seed);
                     require(data.width == (difficulty == SwimDifficulty.Practice ? 25 : difficulty == SwimDifficulty.Normal ? 31 : 37) && data.height == data.width, "Two-dimensional maze dimensions");
-                    require(data.homes.Count == (difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 6 : 9), "Predator count");
+                    require(data.homes.Count == (difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 12 : 18), "Predator count");
+                    var spawnRoute = data.route.FindAll(id => data.passable(id, true) && Vector2.Distance(data.center(id), data.center(data.start)) >= data.tileSize * 6f && Vector2.Distance(data.center(id), data.center(data.exit)) >= data.tileSize * 6f); //안전 여유를 제외한 출구 경로
+                    int routeHomes = 0; //주 이동 동선 위의 포식자 수
+                    bool[] guarded = new bool[3]; //앞과 중간 및 뒤 구간의 포식자 존재
+                    for (int i = 0; i < spawnRoute.Count; i++)
+                    {
+                        if (!data.homes.Contains(spawnRoute[i])) continue;
+                        routeHomes++;
+                        guarded[Mathf.Min(2, i * 3 / spawnRoute.Count)] = true;
+                    }
+                    require(guarded[0] && guarded[1] && guarded[2] && routeHomes >= Mathf.CeilToInt(data.homes.Count * .5f), "Main route has distributed predators rather than one empty stretch");
+                    for (int i = 0; i < data.homes.Count; i++)
+                    for (int j = i + 1; j < data.homes.Count; j++)
+                        require(Vector2.Distance(data.center(data.homes[i]), data.center(data.homes[j])) >= data.tileSize * 3.5f, "Dense spawns retain body clearance");
                     require(data.route.Count >= data.width * 1.4f, "Endpoint path distance");
                     require(Vector2.Distance(data.center(data.start), data.center(data.exit)) >= data.width * data.tileSize * .4f, "Endpoint spatial separation");
                     int[] connected = data.distancesFrom(data.start); //시작과 연결된 물길

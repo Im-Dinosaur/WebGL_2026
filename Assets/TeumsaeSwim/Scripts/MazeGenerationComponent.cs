@@ -12,8 +12,10 @@ namespace TeumsaeSwim
         [SerializeField, Range(17, 61)] private int challengeSize = 37; //도전 미로의 한 변 칸 수
         [SerializeField, Range(0f, .15f)] private float loopRatio = .045f; //격자 방 수에 대한 추가 우회로 비율
         [SerializeField, Min(1)] private int practicePredators = 3; //연습 포식자 수
-        [SerializeField, Min(1)] private int normalPredators = 6; //기본 포식자 수
-        [SerializeField, Min(1)] private int challengePredators = 9; //도전 포식자 수
+        [SerializeField, Min(1)] private int normalPredators = 12; //기본 포식자 수
+        [SerializeField, Min(1)] private int challengePredators = 18; //도전 포식자 수
+        [SerializeField, Range(2f, 6f)] private float predatorSpacing = 3.5f; //포식자 시작 위치 사이의 최소 간격 칸 수
+        [SerializeField, Range(.5f, 1f)] private float mainRoutePredatorRatio = .7f; //출구 경로에 우선 배치할 포식자 비율
 
         public int predatorCountFor(SwimDifficulty difficulty) //생성과 메뉴에서 공유하는 난이도별 포식자 수
         {
@@ -162,26 +164,57 @@ namespace TeumsaeSwim
             return placed.Count == count;
         }
 
-        private bool placePredators(MazeData data, System.Random random, int count) //안전구역에서 떨어진 순찰 가능한 통로에 포식자 배치
+        private bool placePredators(MazeData data, System.Random random, int count) //주 경로의 앞과 중간 및 뒤에 포식자를 나누고 분기까지 배치
         {
-            var candidates = new List<int>(data.route); //주 경로를 우선하는 배치 후보
-            shuffle(candidates, random);
-            var branches = new List<int>(); //나머지 탐색 구역의 후보
-            for (int id = 0; id < data.cells.Length; id++) if (!data.route.Contains(id)) branches.Add(id);
-            shuffle(branches, random);
-            candidates.AddRange(branches);
-            foreach (int id in candidates)
+            var routeCandidates = new List<int>(); //안전구역 여유를 제외한 순서 있는 출구 경로
+            foreach (int id in data.route)
+                if (data.passable(id, true) && !nearEndpoint(data, id, 6f)) routeCandidates.Add(id);
+            if (routeCandidates.Count < Mathf.Min(3, count)) return false;
+            var sections = new[] { new List<int>(), new List<int>(), new List<int>() }; //실제로 배치 가능한 경로의 세 구간
+            for (int i = 0; i < routeCandidates.Count; i++) sections[Mathf.Min(2, i * 3 / routeCandidates.Count)].Add(routeCandidates[i]);
+            foreach (List<int> section in sections) shuffle(section, random);
+            for (int i = 0; i < Mathf.Min(3, count); i++)
+                if (!tryPlacePredator(data, sections[i])) return false;
+            int routeTarget = Mathf.Min(count, Mathf.Max(3, Mathf.CeilToInt(count * mainRoutePredatorRatio))); //주 경로 우선 할당량
+            while (data.homes.Count < routeTarget)
             {
-                if (data.homes.Count >= count) break;
-                if (!data.passable(id, true) || nearEndpoint(data, id, 6f)) continue;
-                if (data.homes.Exists(home => Vector2.Distance(data.center(home), data.center(id)) < data.tileSize * 5f)) continue;
+                bool placed = false; //한 구간에 몰리지 않도록 돌아가며 배치
+                foreach (List<int> section in sections)
+                {
+                    if (data.homes.Count >= routeTarget) break;
+                    placed |= tryPlacePredator(data, section);
+                }
+                if (!placed) break;
+            }
+            if (data.homes.Count < Mathf.CeilToInt(count * .5f)) return false;
+            var routeCells = new HashSet<int>(data.route); //분기 후보를 빠르게 구분할 경로 집합
+            var branches = new List<int>(); //나머지 탐색 구역의 후보
+            for (int id = 0; id < data.cells.Length; id++)
+                if (!routeCells.Contains(id) && data.passable(id, true) && !nearEndpoint(data, id, 6f)) branches.Add(id);
+            shuffle(branches, random);
+            while (data.homes.Count < count && tryPlacePredator(data, branches)) { }
+            foreach (List<int> section in sections)
+                while (data.homes.Count < count && tryPlacePredator(data, section)) { }
+            return data.homes.Count == count;
+        }
+
+        private bool tryPlacePredator(MazeData data, List<int> candidates) //간격과 실제 순찰 공간을 확보한 후보 하나를 사용
+        {
+            while (candidates.Count > 0)
+            {
+                int last = candidates.Count - 1; //한 번 검사한 후보는 다시 검색하지 않음
+                int id = candidates[last]; //섞인 순서의 다음 후보
+                candidates.RemoveAt(last);
+                if (data.homes.Exists(home => Vector2.Distance(data.center(home), data.center(id)) < data.tileSize * predatorSpacing)) continue;
                 int[] distances = data.distancesFrom(id, true); //닫힌 장애물을 반영한 순찰 가능 범위
                 int patrolCells = 0; //충분히 움직일 수 있는 주변 칸 수
-                foreach (int distance in distances) if (distance >= 0 && distance <= 8) patrolCells++;
+                foreach (int distance in distances)
+                    if (distance >= 0 && distance <= 8 && ++patrolCells >= 7) break;
                 if (patrolCells < 7) continue;
                 data.homes.Add(id);
+                return true;
             }
-            return data.homes.Count == count;
+            return false;
         }
 
         private void placeGrass(MazeData data, System.Random random) //주 경로와 분기에 은신처 분산 배치

@@ -24,7 +24,7 @@ namespace TeumsaeSwim.Editor
                 {
                     maze.initialize(3500 + seed, difficulty);
                     int[] cells = supply.fieldSupplies.Select(item => item.cell).ToArray(); //같은 시드의 첫 보급 위치
-                    require(maze.data.homes.Count == 3 * ((int)difficulty + 1), "Increased predator population");
+                    require(maze.data.homes.Count == (difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 12 : 18), "Increased predator population");
                     require(supply.fieldSupplies.Count == (int)difficulty + 2, "Difficulty supply population");
                     require(cells.Distinct().Count() == cells.Length && supply.fieldSupplies.All(item => item.available), "All supplies spawn separately");
                     int[] distances = maze.data.distancesFrom(maze.data.start); //실제 통로 연결

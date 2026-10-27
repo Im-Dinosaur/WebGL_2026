@@ -22,8 +22,8 @@ namespace TeumsaeSwim.Editor
             setReference(style, "titleLogo", logo);
             var generation = new SerializedObject(maze.GetComponent<MazeGenerationComponent>()); //실제 씬에 저장된 난이도 값
             generation.FindProperty("practicePredators").intValue = 3;
-            generation.FindProperty("normalPredators").intValue = 6;
-            generation.FindProperty("challengePredators").intValue = 9;
+            generation.FindProperty("normalPredators").intValue = 12;
+            generation.FindProperty("challengePredators").intValue = 18;
             generation.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(maze.gameObject.scene);
             EditorSceneManager.SaveScene(maze.gameObject.scene);

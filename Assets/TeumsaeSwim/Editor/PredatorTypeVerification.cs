@@ -52,7 +52,7 @@ namespace TeumsaeSwim.Editor
             foreach (SwimDifficulty difficulty in Enum.GetValues(typeof(SwimDifficulty)))
             {
                 var combinations = new HashSet<string>(); //시드에 따라 바뀌는 순서
-                int count = difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 6 : 9; //기존 난이도별 수
+                int count = difficulty == SwimDifficulty.Practice ? 3 : difficulty == SwimDifficulty.Normal ? 12 : 18; //실제 난이도별 포식자 수
                 for (int seed = 0; seed < 200; seed++)
                 {
                     PredatorTypeProfile[] first = roster.createRoster(seed, count, difficulty); //첫 조합

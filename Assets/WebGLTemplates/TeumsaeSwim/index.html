@@ -28,7 +28,7 @@
       <div id="status">처음 접속하면 잠시 걸릴 수 있어요.</div><div id="error"></div>
       <button id="retry" hidden onclick="location.reload()">다시 불러오기</button>
     </div>
-    <span id="build-version" aria-label="게임 버전 1.1.1">v1.1.1</span>
+    <span id="build-version" aria-label="게임 버전 1.1.2">v1.1.2</span>
   </main>
   <script>
     const canvas = document.getElementById('unity-canvas');
@@ -42,7 +42,7 @@
     }
     const config = {
       dataUrl: 'Build/{{{ DATA_FILENAME }}}', frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}', codeUrl: 'Build/{{{ CODE_FILENAME }}}',
-      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.1',
+      streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.2',
       matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
     };
