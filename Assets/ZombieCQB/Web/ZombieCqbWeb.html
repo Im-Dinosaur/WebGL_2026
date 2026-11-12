@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1116">
+  <link rel="icon" href="data:,">
+  <title>감염 구역</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, "Malgun Gothic", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: #080d11; color: #e8f3e7; overflow: hidden; }
+    #player { position: relative; width: min(100vw, calc(100dvh * 16 / 9)); aspect-ratio: 16 / 9; background: #0b1116; }
+    canvas { display: block; width: 100%; height: 100%; outline: none; }
+    #loading { position: absolute; inset: 0; display: grid; place-content: center; padding: 24px; text-align: center; background: radial-gradient(ellipse at 50% 47%, #1b322e, #0b1116 65%); }
+    #loading[hidden] { display: none; }
+    h1 { margin: 0 0 22px; font-size: clamp(25px, 4.8vw, 62px); letter-spacing: -0.045em; }
+    progress { width: min(285px, 60vw); height: 9px; accent-color: #a5f1b0; }
+    #message { margin-top: 14px; font-size: 14px; color: #a1b9af; }
+  </style>
+</head>
+<body>
+  <main id="player">
+    <canvas id="game" tabindex="-1" aria-label="감염 구역 게임 화면"></canvas>
+    <div id="loading" role="status">
+      <h1>감염 구역</h1>
+      <progress id="progress" max="1" value="0"></progress>
+      <div id="message">불러오는 중</div>
+    </div>
+  </main>
+  <script src="@LOADER@"></script>
+  <script>
+    const canvas = document.getElementById("game");
+    const loading = document.getElementById("loading");
+    const progress = document.getElementById("progress");
+    const message = document.getElementById("message");
+    const config = {
+      dataUrl: "@DATA@",
+      frameworkUrl: "@FRAMEWORK@",
+      codeUrl: "@CODE@",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Zombie CQB",
+      productName: "감염 구역",
+      productVersion: "0.1",
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 1.75)
+    };
+    function showError(error) {
+      progress.hidden = true;
+      message.textContent = "게임을 불러오지 못했습니다. 웹 서버에서 다시 열어 주세요.";
+      console.error(error);
+    }
+    if (typeof createUnityInstance === "function") {
+      createUnityInstance(canvas, config, value => { progress.value = value; }).then(() => {
+        loading.hidden = true;
+        document.body.dataset.ready = "true";
+        canvas.focus();
+      }).catch(showError);
+    } else {
+      showError(new Error("Unity loader unavailable"));
+    }
+  </script>
+</body>
+</html>
