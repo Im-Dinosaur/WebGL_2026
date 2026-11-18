@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/TeumsaeSwim/Scenes/Login.unity
+    guid: 649a7d51c873f0046bed7007232f7df2
+  - enabled: 1
+    path: Assets/TeumsaeSwim/Scenes/TeumsaeSwim.unity
+    guid: 4043ea472ed2e904d98466785f9bcc9c
+  - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 9ee53230f4741d6408a6ac30977261a0
   - enabled: 1

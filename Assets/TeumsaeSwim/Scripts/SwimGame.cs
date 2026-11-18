@@ -79,6 +79,13 @@ namespace TeumsaeSwim
             {
                 player.resetInput();
                 session.saveRecord();
+                if (phase == SwimPhase.Won)
+                {
+                    int bestStars = Mathf.Max(PlayerPrefs.GetInt(ScoreSaver.LocalBestKey, 0), stars);
+                    PlayerPrefs.SetInt(ScoreSaver.LocalBestKey, bestStars);
+                    PlayerPrefs.Save();
+                    if (ScoreSaver.Instance != null) ScoreSaver.Instance.Save(bestStars);
+                }
                 audioComponent.setPhase(phase);
                 audioComponent.play(phase == SwimPhase.Won ? SwimCue.Win : SwimCue.Lose);
                 ui.showPhase();

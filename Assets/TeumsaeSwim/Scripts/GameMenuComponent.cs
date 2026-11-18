@@ -24,6 +24,7 @@ namespace TeumsaeSwim
         private Text resultTimeGoal; //시간 별 결과 사유
         private Text resultEscape; //탈출 별 결과 사유
         private Text resultCount; //획득한 별 개수
+        private Text onlineStatus; //서버 저장 상태
         private GameUIIconComponent homeSound; //홈 소리 버튼 그림
         private readonly Button[] difficulties = new Button[3]; //선택 가능한 난이도
         private readonly GameUIIconComponent[] stars = new GameUIIconComponent[3]; //결과 별 그림
@@ -41,6 +42,17 @@ namespace TeumsaeSwim
             createResult();
             createHelp();
             selectDifficulty(selected);
+            if (ScoreSaver.Instance != null) ScoreSaver.Instance.StatusChanged += showOnlineStatus;
+        }
+
+        private void OnDestroy()
+        {
+            if (ScoreSaver.Instance != null) ScoreSaver.Instance.StatusChanged -= showOnlineStatus;
+        }
+
+        private void showOnlineStatus(string value)
+        {
+            if (onlineStatus != null) onlineStatus.text = value;
         }
 
         private void createHome() //숨은 물고기 배경과 난이도 및 큰 시작 버튼으로 구성한 홈
@@ -51,6 +63,12 @@ namespace TeumsaeSwim
             Button sound = style.button(root, "", new Vector2(195, 369), Vector2.one * 44, () => game.toggleMute()); //홈 소리 버튼
             homeSound = style.icon(sound.GetComponent<RectTransform>(), SwimUIIcon.Sound, new Vector2(0, 4), 23, GameUIStyleComponent.cream);
             style.logo(root, new Vector2(0, 278), new Vector2(435, 145));
+            if (!string.IsNullOrEmpty(AuthManager.Uid))
+            {
+                var guest = style.card(root, "Guest identity", new Vector2(0, 168), new Vector2(230, 38), GameUIStyleComponent.panel, GameUIStyleComponent.border);
+                style.text(guest.rectTransform, AuthManager.GuestName, Vector2.zero, new Vector2(215, 30), 17, GameUIStyleComponent.cream);
+                style.button(root, "로그아웃", new Vector2(0, 116), new Vector2(160, 38), AuthManager.Logout, false, 16);
+            }
             style.text(root, "난이도", new Vector2(0, 0), new Vector2(180, 34), 23, SwimArt.mint, TextAnchor.MiddleCenter, true);
             style.picture(root, "Difficulty line left", "box", new Vector2(-88, 0), new Vector2(30, 1), SwimArt.mint);
             style.picture(root, "Difficulty line right", "box", new Vector2(88, 0), new Vector2(30, 1), SwimArt.mint);
@@ -109,6 +127,7 @@ namespace TeumsaeSwim
             resultCount = style.text(root, "", new Vector2(0, 112), new Vector2(420, 31), 16, SwimArt.mint);
             resultTime = style.text(root, "", new Vector2(0, 60), new Vector2(420, 62), 39, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
             resultHint = style.text(root, "", new Vector2(0, 13), new Vector2(420, 30), 13, GameUIStyleComponent.muted);
+            onlineStatus = style.text(root, "", new Vector2(0, -161), new Vector2(420, 23), 11, GameUIStyleComponent.muted);
             RectTransform summary = style.card(root, "Star results", new Vector2(0, -84), new Vector2(390, 133), GameUIStyleComponent.panel, GameUIStyleComponent.border).rectTransform; //개별 달성 조건
             resultEscape = style.text(summary, "", new Vector2(0, 39), new Vector2(350, 32), 16, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
             resultTimeGoal = style.text(summary, "", Vector2.zero, new Vector2(350, 32), 16, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
@@ -181,7 +200,8 @@ namespace TeumsaeSwim
                 bool won = game.phase == SwimPhase.Won; //탈출 성공
                 resultTitle.text = won ? "바깥바다에 도착!" : "앗, 들켜 버렸어";
                 resultTitle.color = won ? SwimArt.mint : SwimArt.coral;
-                resultCount.text = won ? "별 " + game.stars + "개 획득!" : "다시 숨고, 다시 헤엄쳐요";
+                resultCount.text = won ? "별 " + game.stars + "개 획득!  ·  최고 별 " + PlayerPrefs.GetInt(ScoreSaver.LocalBestKey, 0) + "개" : "다시 숨고, 다시 헤엄쳐요";
+                showOnlineStatus(ScoreSaver.Instance != null ? ScoreSaver.Instance.Status : "");
                 bool[] earned = { won, game.timeStar, game.cargoDelivered }; //별별 확정 결과
                 for (int i = 0; i < 3; i++) stars[i].configure(SwimUIIcon.Star, earned[i] ? SwimArt.yellow : GameUIStyleComponent.border, earned[i]);
                 resultTime.text = GameUIComponent.formatTime(game.elapsed);
