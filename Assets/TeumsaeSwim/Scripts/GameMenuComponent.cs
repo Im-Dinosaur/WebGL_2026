@@ -25,6 +25,7 @@ namespace TeumsaeSwim
         private Text resultEscape; //탈출 별 결과 사유
         private Text resultCount; //획득한 별 개수
         private Text onlineStatus; //서버 저장 상태
+        private Button doubleButton;
         private GameUIIconComponent homeSound; //홈 소리 버튼 그림
         private readonly Button[] difficulties = new Button[3]; //선택 가능한 난이도
         private readonly GameUIIconComponent[] stars = new GameUIIconComponent[3]; //결과 별 그림
@@ -127,14 +128,15 @@ namespace TeumsaeSwim
             resultCount = style.text(root, "", new Vector2(0, 112), new Vector2(420, 31), 16, SwimArt.mint);
             resultTime = style.text(root, "", new Vector2(0, 60), new Vector2(420, 62), 39, GameUIStyleComponent.cream, TextAnchor.MiddleCenter, true);
             resultHint = style.text(root, "", new Vector2(0, 13), new Vector2(420, 30), 13, GameUIStyleComponent.muted);
-            onlineStatus = style.text(root, "", new Vector2(0, -161), new Vector2(420, 23), 11, GameUIStyleComponent.muted);
+            onlineStatus = style.text(root, "", new Vector2(0, -157), new Vector2(420, 20), 11, GameUIStyleComponent.muted);
             RectTransform summary = style.card(root, "Star results", new Vector2(0, -84), new Vector2(390, 133), GameUIStyleComponent.panel, GameUIStyleComponent.border).rectTransform; //개별 달성 조건
             resultEscape = style.text(summary, "", new Vector2(0, 39), new Vector2(350, 32), 16, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
             resultTimeGoal = style.text(summary, "", Vector2.zero, new Vector2(350, 32), 16, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
             resultCargo = style.text(summary, "", new Vector2(0, -39), new Vector2(350, 32), 16, GameUIStyleComponent.cream, TextAnchor.MiddleLeft);
-            style.button(root, "같은 미로 다시 도전", new Vector2(0, -209), new Vector2(378, 61), () => game.begin(game.difficulty, false), true, 22);
-            style.button(root, "새 미로 헤엄치기", new Vector2(0, -286), new Vector2(378, 50), () => game.begin(game.difficulty), false, 18);
-            style.button(root, "시작 화면으로", new Vector2(0, -353), new Vector2(280, 44), () => game.home(), false, 16);
+            doubleButton = style.button(root, "광고 보고 점수 2배", new Vector2(0, -193), new Vector2(378, 42), () => game.watchAdForDouble(), false, 18);
+            style.button(root, "같은 미로 다시 도전", new Vector2(0, -250), new Vector2(378, 49), () => game.restartWithAd(false), true, 20);
+            style.button(root, "새 미로 헤엄치기", new Vector2(0, -310), new Vector2(378, 45), () => game.restartWithAd(true), false, 18);
+            style.button(root, "시작 화면으로", new Vector2(0, -366), new Vector2(280, 40), () => game.home(), false, 16);
         }
 
         private void createHelp() //짧은 두 페이지로 나눈 규칙과 포식자 안내
@@ -200,7 +202,8 @@ namespace TeumsaeSwim
                 bool won = game.phase == SwimPhase.Won; //탈출 성공
                 resultTitle.text = won ? "바깥바다에 도착!" : "앗, 들켜 버렸어";
                 resultTitle.color = won ? SwimArt.mint : SwimArt.coral;
-                resultCount.text = won ? "별 " + game.stars + "개 획득!  ·  최고 별 " + PlayerPrefs.GetInt(ScoreSaver.LocalBestKey, 0) + "개" : "다시 숨고, 다시 헤엄쳐요";
+                resultCount.text = won ? "별 " + game.stars + "개 · 점수 " + game.resultScore + " · 최고 점수 " + PlayerPrefs.GetInt(ScoreSaver.LocalBestKey, 0) : "다시 숨고, 다시 헤엄쳐요";
+                doubleButton.gameObject.SetActive(game.canDouble);
                 showOnlineStatus(ScoreSaver.Instance != null ? ScoreSaver.Instance.Status : "");
                 bool[] earned = { won, game.timeStar, game.cargoDelivered }; //별별 확정 결과
                 for (int i = 0; i < 3; i++) stars[i].configure(SwimUIIcon.Star, earned[i] ? SwimArt.yellow : GameUIStyleComponent.border, earned[i]);

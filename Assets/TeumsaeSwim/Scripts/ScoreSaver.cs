@@ -39,7 +39,7 @@ namespace TeumsaeSwim
                 string uid = AuthManager.Uid;
                 string url = DbUrl + "/scores/" + UnityWebRequest.EscapeURL(uid)
                     + ".json?auth=" + UnityWebRequest.EscapeURL(AuthManager.IdToken);
-                SetStatus("서버 최고 별 기록 확인 중...");
+                SetStatus("서버 최고 점수 확인 중...");
                 using (UnityWebRequest get = UnityWebRequest.Get(url))
                 {
                     get.timeout = 20;
@@ -70,7 +70,7 @@ namespace TeumsaeSwim
                             PlayerPrefs.Save();
                         }
                     }
-                    if (score <= best) { SetStatus("서버 최고 별 " + best + "개"); continue; }
+                    if (score <= best) { SetStatus("서버 최고 점수 " + best + "점"); continue; }
                 }
                 if (uid != AuthManager.Uid) break;
                 var data = new ScoreData { name = AuthManager.GuestName, score = score };
@@ -85,7 +85,7 @@ namespace TeumsaeSwim
                         SetStatus("서버 저장 실패 · 다시 로그인해 주세요.");
                         break;
                     }
-                    SetStatus("서버에 최고 별 " + score + "개 저장됨");
+                    SetStatus("서버에 최고 점수 " + score + "점 저장됨");
                     Debug.Log("Firebase best-star score saved.");
                 }
             }

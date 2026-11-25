@@ -41,7 +41,7 @@ namespace TeumsaeSwim.Editor
                 ScoreSaver.Instance.Save(3);
             }
             else if (stage == 2 && ScoreSaver.Instance != null &&
-                (ScoreSaver.Instance.Status == "서버에 최고 별 3개 저장됨" || ScoreSaver.Instance.Status == "서버 최고 별 3개"))
+                (ScoreSaver.Instance.Status == "서버에 최고 점수 3점 저장됨" || ScoreSaver.Instance.Status == "서버 최고 점수 3점"))
             {
                 stage = 3;
                 ScoreSaver.Instance.Save(2);

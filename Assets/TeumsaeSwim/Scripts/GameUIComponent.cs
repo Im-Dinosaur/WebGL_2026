@@ -11,6 +11,7 @@ namespace TeumsaeSwim
         [SerializeField] private GameHUDComponent hud; //실시간 정보와 조작 구성 요소
         [SerializeField] private GameMenuComponent menus; //홈과 안내 및 결과 구성 요소
         public Rect playfield => style.playfield; //플레이어가 가려지지 않는 화면 범위
+        public Font font => art.font;
         public string cargoText => hud.cargoText; //현재 운반 안내
         public string cargoResult => menus.cargoResult; //결과 운반 안내
 

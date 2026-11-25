@@ -17,6 +17,11 @@ namespace TeumsaeSwim
         [SerializeField] private GameAudioComponent audioComponent; //효과음 구성 요소
         private readonly List<Predator> predators = new List<Predator>(); //이번 판 포식자
         private int seed; //재도전에 사용할 미로 시드
+        private static int completedPlays;
+        private static float lastInterstitialTime = -999f;
+        [SerializeField] private float adCooldown = 30f;
+        private bool doubled;
+        private bool adTransition;
         public SwimPhase phase => session.phase; //현재 단계
         public float elapsed => session.elapsed; //현재 플레이 시간
         public SwimDifficulty difficulty => session.difficulty; //현재 난이도
@@ -25,6 +30,8 @@ namespace TeumsaeSwim
         public float timeGoal => session.timeGoal; //현재 시간 별 목표
         public bool timeStar => session.timeStar; //시간 별 달성 결과
         public int stars => session.stars; //이번 판의 획득 별
+        public int resultScore => stars * (doubled ? 2 : 1);
+        public bool canDouble => phase == SwimPhase.Won && !doubled && DummyAds.Instance != null && DummyAds.Instance.IsRewardedReady();
         public IReadOnlyList<PredatorTypeProfile> predatorTypes => roster.types; //도움말에 제공할 종류별 설정
         public bool muted => audioComponent.muted; //현재 음소거 여부
         public int predatorCountFor(SwimDifficulty value) => maze.predatorCountFor(value); //메뉴에 제공할 실제 포식자 수
@@ -35,6 +42,9 @@ namespace TeumsaeSwim
         {
             Application.targetFrameRate = 60;
             Time.timeScale = 1f;
+            if (DummyAds.Instance == null) new GameObject("DummyAds").AddComponent<DummyAds>();
+            DummyAds.Instance.displayFont = ui.font;
+            if (AdStats.Instance == null) new GameObject("AdStats").AddComponent<AdStats>();
             audioComponent.initialize();
             player.cue += audioComponent.play;
             ui.initialize(this, player);
@@ -77,6 +87,7 @@ namespace TeumsaeSwim
             ui.tick(deltaTime);
             if (phase == SwimPhase.Won || phase == SwimPhase.Lost)
             {
+                completedPlays++;
                 player.resetInput();
                 session.saveRecord();
                 if (phase == SwimPhase.Won)
@@ -94,6 +105,7 @@ namespace TeumsaeSwim
 
         public void begin(SwimDifficulty value, bool newMaze = true) //새 게임 또는 같은 미로 재도전
         {
+            doubled = false;
             foreach (Predator predator in predators)
             {
                 predator.gameObject.SetActive(false);
@@ -120,6 +132,39 @@ namespace TeumsaeSwim
             cameraFollow.initialize(player, maze);
             ui.showPhase();
             ui.tick(0);
+        }
+
+        public void restartWithAd(bool newMaze)
+        {
+            if (adTransition) return;
+            adTransition = true;
+            SwimDifficulty selected = difficulty;
+            Action restart = () => { adTransition = false; begin(selected, newMaze); };
+            if (completedPlays >= 2 && Time.realtimeSinceStartup - lastInterstitialTime > adCooldown &&
+                DummyAds.Instance != null && DummyAds.Instance.IsInterstitialReady())
+            {
+                lastInterstitialTime = Time.realtimeSinceStartup;
+                if (AdStats.Instance != null) AdStats.Instance.Count("interstitial");
+                DummyAds.Instance.ShowInterstitial(restart);
+            }
+            else restart();
+        }
+
+        public void watchAdForDouble()
+        {
+            if (!canDouble || adTransition) return;
+            adTransition = true;
+            DummyAds.Instance.ShowRewarded(earned => {
+                adTransition = false;
+                if (!earned || doubled || phase != SwimPhase.Won) return;
+                doubled = true;
+                if (AdStats.Instance != null) AdStats.Instance.Count("rewarded");
+                int best = Mathf.Max(PlayerPrefs.GetInt(ScoreSaver.LocalBestKey, 0), resultScore);
+                PlayerPrefs.SetInt(ScoreSaver.LocalBestKey, best);
+                PlayerPrefs.Save();
+                if (ScoreSaver.Instance != null) ScoreSaver.Instance.Save(best);
+                ui.showPhase();
+            });
         }
 
         public void pause() //모든 게임 시간을 멈추고 입력 해제

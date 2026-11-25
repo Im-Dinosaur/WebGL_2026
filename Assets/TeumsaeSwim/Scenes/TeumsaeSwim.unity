@@ -119,6 +119,66 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &95874404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 95874406}
+  - component: {fileID: 95874405}
+  m_Layer: 0
+  m_Name: DummyAds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &95874405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95874404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b46dffe007c0cfa40bc8c6cf4c5abcc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::DummyAds
+  displayFont: {fileID: 12800000, guid: 2addd77ae7b52c346aa730f5ea3f286f, type: 3}
+  networks:
+  - name: Network A
+    eCPM: 10
+    fillRate: 0.5
+  - name: Network B
+    eCPM: 9
+    fillRate: 0.6
+  - name: Network C
+    eCPM: 7
+    fillRate: 0.8
+  useBidding: 1
+  noFill: 0
+  askSeconds: 0.5
+  interstitialSeconds: 3
+  rewardedSeconds: 5
+--- !u!4 &95874406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95874404}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &625983710
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,6 +226,7 @@ MonoBehaviour:
   cameraFollow: {fileID: 770461726}
   ui: {fileID: 625983714}
   audioComponent: {fileID: 625983712}
+  adCooldown: 30
 --- !u!114 &625983712
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,6 +749,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1331838396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1331838398}
+  - component: {fileID: 1331838397}
+  m_Layer: 0
+  m_Name: AdStats
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1331838397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331838396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b9678436d0ef2d408d670999f108d0b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TeumsaeSwim.AdStats
+--- !u!4 &1331838398
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331838396}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1359333864
 GameObject:
   m_ObjectHideFlags: 0
@@ -1081,3 +1186,5 @@ SceneRoots:
   - {fileID: 634707484}
   - {fileID: 1363019903}
   - {fileID: 625983716}
+  - {fileID: 95874406}
+  - {fileID: 1331838398}

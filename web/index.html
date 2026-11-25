@@ -41,12 +41,12 @@
       document.getElementById('retry').hidden=false;
     }
     const config = {
-      dataUrl: 'Build/web.data.unityweb', frameworkUrl: 'Build/web.framework.js.unityweb', codeUrl: 'Build/web.wasm.unityweb',
+      dataUrl: 'Build/web10.data.unityweb', frameworkUrl: 'Build/web10.framework.js.unityweb', codeUrl: 'Build/web10.wasm.unityweb',
       streamingAssetsUrl: 'StreamingAssets', companyName: 'Teumsae Swim', productName: '숨바꼬기', productVersion: '1.1.2',
       matchWebGLToCanvasSize: true, devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       showBanner: (message,type) => { if(type==='error') showError(''); else console.warn(message); }
     };
-    const loader=document.createElement('script');loader.src='Build/web.loader.js';
+    const loader=document.createElement('script');loader.src='Build/web10.loader.js';
     loader.onerror=()=>showError('파일 다운로드 오류');
     loader.onload=()=>createUnityInstance(canvas,config,p=>{
       document.getElementById('progress').style.width=Math.round(p*100)+'%';
